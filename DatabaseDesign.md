@@ -48,7 +48,7 @@ The actual verses of the Bible.
 
 Field Name | Data Type | Allow Null | Key | Default | Extra | Notes
 ---------- | --------- | ---------- | --- | ------- | ----- | -----
-VerseID | VARCHAR(64) | NO | Primary | NULL |    | Format: <BibID><BookID>HEX(<ChapterNum>)HEX(<VerseNum>)
+VerseID | VARCHAR(64) | NO | Primary | NULL |    | Format: {BibID}{BookID}HEX({ChapterNum})HEX({VerseNum})
 BibID | VARCHAR(16) | NO | Foreign | NULL |    | Links to BibleTrans
 BookID | VARCHAR(16) | NO | Foreign | NULL |    | Links to BibleBook
 ChapterNum | UNSIGNED SMALLINT | NO | NO | 0 |    | Chapter
