@@ -1,6 +1,8 @@
 # Open Trebuchet Database Design
 
-The Database is to be called "**open_trebuchet**".  Two users will have access to it: "**trebuchet_admin**" (with full access to the database) and "**trebuchet_user**" (with Insert, Update, Select and Delete).
+The following is the design for the back-end database for Open Trebuchet.  This design will be implemented in SQLite.  For the older design for MySQL, see the document "DatabaseDesignForMySQL.md".
+
+Since SQLite does not implement users and privileges, these will be managed by the program.  As SQLite has limited data-types, the sizes of fields will be detailed in the notes columns.
 
 ## BibleTrans:
 
@@ -8,18 +10,18 @@ The Bible translations stored.
 
 Field Name | Data Type | Allow Null | Key | Default | Extra | Notes
 ---------- | --------- | ---------- | --- | ------- | ----- | -----
-BibID | VARCHAR(16) | NO | Primary | NULL |   | Translation identifier (E.G. WEB)
-Name | VARCHAR(255) | NO | NO | NULL |    | Name of the translation (E.G. World English Bible)
-Copyright | TEXT | YES | NO | NULL |    | Copyright information for the Bible translation
-Year | VARCHAR(8) | YES | NO | NULL |    | Year of publication
-Notes | TEXT | YES | NO | NULL |    | Any extra information the publisher wishes to store
+BibID | TEXT | NO | Primary | NULL |   | (16-Character Translation) identifier (E.G. WEB)
+Name | TEXT | NO | NO | NULL |    | (255-Character) Name of the translation (E.G. World English Bible)
+Copyright | TEXT | YES | NO | NULL |    | (65535-Character) Copyright information for the Bible translation
+Year | TEXT | YES | NO | NULL |    | (8-Character) Year of publication
+Notes | TEXT | YES | NO | NULL |    | (65535-Character) Any extra information the publisher wishes to store
 
-```mysql
+```sqlite
 CREATE TABLE BibleTrans (
-BibID VARCHAR(16) NOT NULL PRIMARY KEY,
-Name VARCHAR(255) NOT NULL,
+BibID TEXT NOT NULL PRIMARY KEY,
+Name TEXT NOT NULL,
 Copyright TEXT DEFAULT NULL,
-Year VARCHAR(8) DEFAULT NULL,
+Year TEXT DEFAULT NULL,
 Notes TEXT DEFAULT NULL
 );
 ```
@@ -31,13 +33,13 @@ The Names of the Books.
 
 Field Name | Data Type | Allow Null | Key | Default | Extra | Notes
 ---------- | --------- | ---------- | --- | ------- | ----- | -----
-BookID | VARCHAR(16) | NO | Primary | NULL |    | Short name of Book (E.G. 2CHRON)
-Name | VARCHAR(255) | NO | NO | NULL |    | Name of Book (E.G. 2 Chronicles)
+BookID | TEXT | NO | Primary | NULL |    | (16-Character) Short name of Book (E.G. 2CHRON)
+Name | TEXT | NO | NO | NULL |    | (255-Character) Name of Book (E.G. 2 Chronicles)
 
-```mysql
+```sqlite
 CREATE TABLE BibleBook (
-BookID VARCHAR(16) NOT NULL PRIMARY KEY,
-Name VARCHAR(255) NOT NULL
+BookID TEXT NOT NULL PRIMARY KEY,
+Name TEXT NOT NULL
 );
 ```
 
@@ -48,30 +50,24 @@ The actual verses of the Bible.
 
 Field Name | Data Type | Allow Null | Key | Default | Extra | Notes
 ---------- | --------- | ---------- | --- | ------- | ----- | -----
-VerseID | VARCHAR(64) | NO | Primary | NULL |    | Format: {BibID}{BookID}HEX({ChapterNum})HEX({VerseNum})
-BibID | VARCHAR(16) | NO | Foreign | NULL |    | Links to BibleTrans
-BookID | VARCHAR(16) | NO | Foreign | NULL |    | Links to BibleBook
-ChapterNum | UNSIGNED SMALLINT | NO | NO | 0 |    | Chapter
-VerseNum | UNSIGNED SMALLINT | NO | NO | 0 |    | Verse
-VerseText | TEXT | YES | NO | NULL |    | Text of the verse
+VerseID | TEXT | NO | Primary | NULL |    | (64-Character) Verse ID, format: {BibID}{BookID}HEX({ChapterNum})HEX({VerseNum})
+BibID | TEXT | NO | Foreign | NULL |    | (16-Character) Bible ID, Links to BibleTrans
+BookID | TEXT | NO | Foreign | NULL |    | (16-Character) Book ID Links to BibleBook
+ChapterNum | INTEGER | NO | NO | 0 |    | (0-32767) Chapter
+VerseNum | INTEGER | NO | NO | 0 |    | (0-32767) Verse
+VerseText | TEXT | YES | NO | NULL |    | (65535-Chararcter) Text of the verse
 
-```mysql
+```sqlite
 CREATE TABLE BibleVerse (
-VerseID VARCHAR(64) NOT NULL PRIMARY KEY,
-BibID VARCHAR(16) NOT NULL,
-BookID VARCHAR(16) NOT NULL,
-ChapterNum SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-VerseNum SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-VerseText TEXT DEFAULT NULL
+VerseID TEXT NOT NULL PRIMARY KEY,
+BibID TEXT NOT NULL,
+BookID TEXT NOT NULL,
+ChapterNum INTEGER NOT NULL DEFAULT 0,
+VerseNum INTEGER NOT NULL DEFAULT 0,
+VerseText TEXT DEFAULT NULL,
+FOREIGN KEY (BibID) REFERENCES BibleTrans (BibID),
+FOREIGN KEY (BookID) REFERENCES BibleBook (BookID)
 );
-
-ALTER TABLE BibleVerse
-ADD FOREIGN KEY (BibID)
-REFERENCES BibleTrans(BibID);
-
-ALTER TABLE BibleVerse
-ADD FOREIGN KEY (BookID)
-REFERENCES BibleBook(BookID);
 ```
 
 
@@ -81,20 +77,17 @@ Some verses have translation notes.
 
 Field Name | Data Type | Allow Null | Key | Default | Extra | Notes
 ---------- | --------- | ---------- | --- | ------- | ----- | -----
-NoteID | UNSIGNED BIGINT | NO | Primary | 0 | AUTO_INCREMENT | 
-VerseID | VARCHAR(64) | NO | Foreign | NULL |    | Verse to which the note refers (Links to BibleVerse)
-NoteText | TEXT | YES | NO | NULL |    | Text of the note
+NoteID | INTEGER | NO | Primary | 0 | AUTOINCREMENT | (0-18446744073709551615) RowID
+VerseID | TEXT | NO | Foreign | NULL |    | (64-Character) Verse to which the note refers (Links to BibleVerse)
+NoteText | TEXT | YES | NO | NULL |    | (65535-Character) Text of the note
 
-```mysql
+```sqlite
 CREATE TABLE BibleNote (
-NoteID BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-VerseID VARCHAR(64) NOT NULL,
-NoteText TEXT DEFAULT NULL
+NoteID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+VerseID TEXT NOT NULL,
+NoteText TEXT DEFAULT NULL,
+FOREIGN KEY (VerseID) REFERENCES BibleVerse (VerseID)
 );
-
-ALTER TABLE BibleNote
-ADD FOREIGN KEY (VerseID)
-REFERENCES BibleVerse(VerseID);
 ```
 
 
@@ -104,17 +97,19 @@ Songs.
 
 Field Name | Data Type | Allow Null | Key | Default | Extra | Notes
 ---------- | --------- | ---------- | --- | ------- | ----- | -----
-SongTitle | VARCHAR(255)| NO | Primary | NULL |    | Title of the song
-Author | VARCHAR(255) | YES | NO | NULL |    | Author(s) of the song
-Copyright | TEXT | YES | NO | NULL |    | Copyright information of the song
-SongText | LONGTEXT | YES | NO | NULL |    | Text of the song with markup
+SongTitle | TEXT | NO | Primary | NULL |    | (255-Character) Title of the song
+Author | TEXT | YES | NO | NULL |    | (255-Character) Author(s) of the song
+Copyright | TEXT | YES | NO | NULL |    | (65535-Character) Copyright information of the song
+SongText | TEXT | YES | NO | NULL |    | (4294967295-Character) Text of the song with markup
+Year | TEXT | YES | NO | NULL |    | (8-Character) Year the song was published
 
-```mysql
+```sqlite
 CREATE TABLE Song (
-SongTitle VARCHAR(255) NOT NULL PRIMARY KEY,
-Author VARCHAR(255) DEFAULT NULL,
+SongTitle TEXT NOT NULL PRIMARY KEY,
+Author TEXT DEFAULT NULL,
 Copyright TEXT DEFAULT NULL,
-SongText LONGTEXT DEFAULT NULL
+SongText TEXT DEFAULT NULL,
+Year TEXT DEFAULT NULL
 );
 ```
 
@@ -125,21 +120,17 @@ Index for searching first lines of parts of a song.
 
 Field Name | Data Type | Allow Null | Key | Default | Extra | Notes
 ---------- | --------- | ---------- | --- | ------- | ----- | -----
-FLID | UNSIGNED BIGINT | NO | Primary | 0 | AUTO_INCREMENT| 
-SongTitle | VARCHAR(255) | NO | Foreign | NULL |    | Links to Song
-FirstLine | VARCHAR(255) | NO | NO | NULL | INDEX | Searchable first line index FLILineIndex
+FLID | INTEGER | NO | Primary | 0 | AUTOINCREMENT| (0-18446744073709551615) RowID
+SongTitle | TEXT | NO | Foreign | NULL |    | (255-Character) Links to Song
+FirstLine | TEXT | NO | NO | NULL | INDEX | (255-Character) Searchable first line index as FLILineIndex
 
-```mysql
+```sqlite
 CREATE TABLE FLIndex (
-FLID BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+FLID BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTOINCREMENT,
 SongTitle VARCHAR(255) NOT NULL,
-FirstLine VARCHAR(255) NOT NULL
+FirstLine VARCHAR(255) NOT NULL,
+FOREIGN KEY (SongTitle) REFERENCES Song(SongTitle)
 );
 
-ALTER TABLE FLIndex
-ADD FOREIGN KEY (SongTitle)
-REFERENCES Song(SongTitle);
-
-CREATE INDEX FLILineIndex
-ON FLIndex (FirstLine);
+CREATE INDEX FLILineIndex ON FLIndex (FirstLine);
 ```
