@@ -50,7 +50,7 @@ The actual verses of the Bible.
 
 Field Name | Data Type | Allow Null | Key | Default | Extra | Notes
 ---------- | --------- | ---------- | --- | ------- | ----- | -----
-VerseID | TEXT | NO | Primary | NULL |    | (64-Character) Verse ID, format: {BibID}{BookID}HEX({ChapterNum})HEX({VerseNum})
+VerseID | TEXT | NO | Primary | NULL |    | (64-Character) Verse ID, format: {BibID}'_'{BookID}HEX({ChapterNum})HEX({VerseNum}) (E.G. WEB_3JOHN00010001)
 BibID | TEXT | NO | Foreign | NULL |    | (16-Character) Bible ID, Links to BibleTrans
 BookID | TEXT | NO | Foreign | NULL |    | (16-Character) Book ID Links to BibleBook
 ChapterNum | INTEGER | NO | NO | 0 |    | (0-32767) Chapter
