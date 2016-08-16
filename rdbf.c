@@ -35,6 +35,7 @@ void freeresnotes()
             resnote[i] = NULL;
         }
     }
+    resnotenum = 0;
 }
 
 void strtoupper(char *astr)
@@ -80,6 +81,18 @@ void escapeapostrophes(char *outstr, char *instr)
     outstr[j] = 0;
 }
 
+void strleft(char *outstr, char *instr, int chars)
+{
+    if (instr == NULL || outstr == NULL) return;
+    int i;
+    for (i=0;i<chars;i++)
+    {
+        if (instr[i] == 0) break;
+        outstr[i] = instr[i];
+    }
+    outstr[i] = 0;
+}
+
 int streq(char *astr, char *bstr)
 {
     long al, bl;
@@ -95,7 +108,7 @@ int main(int argc, char **argv)
 {
   FILE *bibfile;
   char rdbyte;
-  char tmpstr[65535] = "", *tcol = NULL;
+  char tmpstr[65535] = "", *tcol = NULL, viewverse[33] = "";
   char *col0 = NULL /*ID*/, *col1 = NULL /*Trans*/, *col2 = NULL /*Book*/, *col3 = NULL /*Chapter*/;
   char *col4 = NULL /*Verse*/, *col5 = NULL /*Content*/, *col6 = NULL /*IsNote*/, *col7 = NULL /*HasNote*/;
   int fieldnum = 0, charnum = 0, hasread = 0, isnote = 0;
@@ -107,10 +120,12 @@ int main(int argc, char **argv)
   char *zErrMsg = 0;
   int rc;
 
-  if( argc!=2 ){
+  if( argc!=3 ){
     fprintf(stderr, "Usage: %s DATABASE BIBLE-FILE\r\n", argv[0]);
     return(1);
   }
+
+        printf("--Ping! Working!\r\n");
   
   bibfile = fopen(argv[2],"rb");
   if (bibfile == NULL)
@@ -121,7 +136,7 @@ int main(int argc, char **argv)
   
   rc = sqlite3_open(argv[1], &db);
   if( rc ){
-    fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+    fprintf(stderr, "Can't open database %s: %s\n", argv[1], sqlite3_errmsg(db));
     sqlite3_close(db);
     fclose(bibfile);
     return(2);
@@ -129,10 +144,114 @@ int main(int argc, char **argv)
   
   while (fread(&rdbyte,1,1,bibfile) > 0)
   {
+      if (rdbyte == 0x1F || (rdbyte == 0x1E && hasread != 0))
+      {
+          tmpstr[charnum] = 0;
+          if (fieldnum < 8)
+          {
+              tcol = malloc(sizeof(char)*(charnum+1));
+              if (tcol == NULL)
+              {
+                  /*OoM*/
+                  fprintf(stderr, "Out of Memory after writing %lu records to DB!\r\n", enteredrecs);
+                  fclose(bibfile);
+                  if (col0 != NULL) free(col0);
+                  if (col1 != NULL) free(col1);
+                  if (col2 != NULL) free(col2);
+                  if (col3 != NULL) free(col3);
+                  if (col4 != NULL) free(col4);
+                  if (col5 != NULL) free(col5);
+                  if (col6 != NULL) free(col6);
+                  if (col7 != NULL) free(col7);
+                  if (transid != NULL) free(transid);
+                  if (bookid != NULL) free(bookid);
+                  freeresnotes();
+                  sqlite3_close(db);
+                  return 3;
+              }
+              strcpy(tcol,tmpstr);
+          } else fprintf(stderr, "Too many fields (%d)!  Ignoring this one...\r\n",fieldnum);
+          switch (fieldnum)
+          {
+              case 0:
+                col0 = tcol;
+              break;
+
+              case 1:
+                col1 = tcol;
+              break;
+
+              case 2:
+                col2 = tcol;
+              break;
+
+              case 3:
+                col3 = tcol;
+              break;
+
+              case 4:
+                col4 = tcol;
+              break;
+
+              case 5:
+                col5 = tcol;
+              break;
+
+              case 6:
+                col6 = tcol;
+              break;
+
+              case 7:
+                col7 = tcol;
+              break;
+
+              default:
+                free(tcol);
+              break;
+          }
+          strleft(viewverse,tcol,32);
+          if (fieldnum<8) printf("Field number %d assigned as \"%s\".\r\n",fieldnum,viewverse);
+          tcol = NULL;
+          fieldnum++;
+          charnum = 0;
+          tmpstr[0] = 0;
+      }
+      
       if (rdbyte == 0x1E)
       {
           if (hasread != 0)
           {
+              if (streq(col0,"\r\n"))
+              {
+                  printf("Record is separator...\r\n");
+                  /*Free Cols, then continue*/
+                        printf("Do Free...\r\n");
+                  if (col0 != NULL) free(col0);
+                  if (col1 != NULL) free(col1);
+                  if (col2 != NULL) free(col2);
+                  if (col3 != NULL) free(col3);
+                  if (col4 != NULL) free(col4);
+                  if (col5 != NULL) free(col5);
+                  if (col6 != NULL) free(col6);
+                  if (col7 != NULL) free(col7);
+                  if (transid != NULL) free(transid);
+                  if (bookid != NULL) free(bookid);
+                  col0 = NULL;
+                  col1 = NULL;
+                  col2 = NULL;
+                  col3 = NULL;
+                  col4 = NULL;
+                  col5 = NULL;
+                  col6 = NULL;
+                  col7 = NULL;
+                  transid = NULL;
+                  bookid = NULL;
+                        printf("       ... Freed\r\n");
+                  fieldnum = 0;
+                  charnum = 0;
+                  tmpstr[0] = 0;
+                  continue;
+              }
               /*Write to DB, then free cols*/
               /*Format Cols:*/
               if (transid != NULL) free(transid);
@@ -366,19 +485,25 @@ int main(int argc, char **argv)
                           if( rc!=SQLITE_OK ){
                             fprintf(stderr, "SQL error adding note: %s\n", zErrMsg);
                             sqlite3_free(zErrMsg);
+                          } else {
+                              printf("Note for verse %s added (from reserve).\r\n",resvid);
+                              enteredrecs++;
                           }
                       }
                   }
                   freeresnotes();
+                  
               }
               
               /*Write to DB:*/
+              NumRes = 0;
               sprintf(checkst,"SELECT * FROM BibleTrans WHERE BibID = '%s';",transid);
               rc = sqlite3_exec(db, checkst, getresultsn, 0, &zErrMsg);
               if( rc!=SQLITE_OK ){
                 fprintf(stderr, "SQL error: %s\n", zErrMsg);
                 sqlite3_free(zErrMsg);
               }
+              printf("Trans: NumRes=%d\r\n",NumRes);
               if (NumRes == 0)
               {
                   sprintf(tmpstr,"INSERT INTO BibleTrans(BibID, Name, Copyright, Year, Notes) VALUES ('%s', '%s', NULL, NULL, NULL);",transid,col1);
@@ -389,12 +514,14 @@ int main(int argc, char **argv)
                   }
               }
               
+              NumRes = 0;
               sprintf(checkst,"SELECT * FROM BibleBook WHERE BookID = '%s';",bookid);
               rc = sqlite3_exec(db, checkst, getresultsn, 0, &zErrMsg);
               if( rc!=SQLITE_OK ){
                 fprintf(stderr, "SQL error: %s\n", zErrMsg);
                 sqlite3_free(zErrMsg);
               }
+              printf("Book: NumRes=%d\r\n",NumRes);
               if (NumRes == 0)
               {
                   sprintf(tmpstr,"INSERT INTO BibleBook(BookID, Name) VALUES ('%s', '%s');",bookid,col2);
@@ -405,6 +532,7 @@ int main(int argc, char **argv)
                   }
               }
 
+              int tcolists = 0;
               if (strlen(col5)>65000)
               {
                   tcol = malloc(sizeof(char)*(501+strlen(col5)));
@@ -431,6 +559,7 @@ int main(int argc, char **argv)
               else
               {
                   tcol = tmpstr;
+                  tcolists = 1;
               }
               if (isnote == 0)
               {
@@ -440,21 +569,25 @@ int main(int argc, char **argv)
                   if( rc!=SQLITE_OK ){
                     fprintf(stderr, "SQL error adding verse: %s\n", zErrMsg);
                     sqlite3_free(zErrMsg);
-                  }
+                  } else { printf("Verse %s added.\r\n",vid); enteredrecs++; }
               }
               else
               {
                   /*Do Note*/
                   sprintf(tcol, "INSERT INTO BibleNote (NoteID, VerseID, NoteText) VALUES (NULL, '%s', '%s');", vid, col5);
 
+                  checkst[0] = 0;
+                  NumRes = 0;
                   sprintf(checkst,"SELECT * FROM BibleVerse WHERE VerseID = '%s';",vid);
                   rc = sqlite3_exec(db, checkst, getresultsn, 0, &zErrMsg);
                   if( rc!=SQLITE_OK ){
-                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+                    fprintf(stderr, "SQL error: %s\r\n", zErrMsg);
                     sqlite3_free(zErrMsg);
                   }
+                  printf("Verse: NumRes=%d\r\n",NumRes);
                   if (NumRes == 0)
                   {
+                      printf("Reserving note on verse %s...\r\n", vid);
                       resverse = verse;
                       if (resnotenum > 15)
                       {
@@ -493,14 +626,19 @@ int main(int argc, char **argv)
                       if( rc!=SQLITE_OK ){
                         fprintf(stderr, "SQL error adding note: %s\n", zErrMsg);
                         sqlite3_free(zErrMsg);
+                      } else {
+                          printf("Note for verse %s added.\r\n",vid);
+                          enteredrecs++;
                       }
                   }
                   
               }
-              if (tcol != tmpstr) free(tcol);
+              if (tcolists == 0) free(tcol);
+              /*if (tcol != tmpstr) free(tcol);*/
               tcol = NULL;
               
               /*Freeing Cols:*/
+                    printf("Do Free...\r\n");
               if (col0 != NULL) free(col0);
               if (col1 != NULL) free(col1);
               if (col2 != NULL) free(col2);
@@ -521,76 +659,14 @@ int main(int argc, char **argv)
               col7 = NULL;
               transid = NULL;
               bookid = NULL;
+                    printf("       ... Freed\r\n");
           }
           fieldnum = 0;
-      }
-      else if (rdbyte == 0x1F)
-      {
-          tmpstr[charnum] = 0;
-          if (fieldnum < 8)
-          {
-              tcol = malloc(sizeof(char)*(charnum+1));
-              if (tcol == NULL)
-              {
-                  /*OoM*/
-                  fprintf(stderr, "Out of Memory after writing %lu records to DB!\r\n", enteredrecs);
-                  fclose(bibfile);
-                  if (col0 != NULL) free(col0);
-                  if (col1 != NULL) free(col1);
-                  if (col2 != NULL) free(col2);
-                  if (col3 != NULL) free(col3);
-                  if (col4 != NULL) free(col4);
-                  if (col5 != NULL) free(col5);
-                  if (col6 != NULL) free(col6);
-                  if (col7 != NULL) free(col7);
-                  if (transid != NULL) free(transid);
-                  if (bookid != NULL) free(bookid);
-                  freeresnotes();
-                  sqlite3_close(db);
-                  return 3;
-              }
-              strcpy(tcol,tmpstr);
-          }
-          switch (fieldnum)
-          {
-              case 0:
-                col0 = tcol;
-              break;
-
-              case 1:
-                col1 = tcol;
-              break;
-
-              case 2:
-                col2 = tcol;
-              break;
-
-              case 3:
-                col3 = tcol;
-              break;
-
-              case 4:
-                col4 = tcol;
-              break;
-
-              case 5:
-                col5 = tcol;
-              break;
-
-              case 6:
-                col6 = tcol;
-              break;
-
-              case 7:
-                col7 = tcol;
-              break;
-          }
-          tcol = NULL;
-          fieldnum++;
           charnum = 0;
           tmpstr[0] = 0;
       }
-      else
+//      else 
+      else if (rdbyte != 0x1F)
       {
           tmpstr[charnum] = rdbyte;
           charnum++;
@@ -603,6 +679,27 @@ int main(int argc, char **argv)
   }
   else
   {
+      /*Write any leftover notes if moved on:*/
+      if (resnotenum > 0)
+      {
+          int i;
+          for (i=0;i<resnotenum;i++)
+          {
+              if (resnote[i] != NULL)
+              {
+                  rc = sqlite3_exec(db, resnote[i], getresultsn, 0, &zErrMsg);
+                  if( rc!=SQLITE_OK ){
+                    fprintf(stderr, "SQL error adding note: %s\n", zErrMsg);
+                    sqlite3_free(zErrMsg);
+                  } else {
+                    printf("Note for verse %s added (from reserve).\r\n",resvid);
+                    enteredrecs++;
+                  }
+              }
+          }
+          freeresnotes();
+          
+      }
       printf("%lu records written to DB!\r\n",enteredrecs);
   }
   
