@@ -1,6 +1,18 @@
 # Open-Trebuchet
 Open-source church projection software for Windows.
 
+## Files
+
+* "README.md" is this file.
+* "DatabaseDesign.md" contains the design of the database.
+* "DatabaseDesignForMySQL.md" contains the old design of the database from when it was going to be implemented in MySQL.
+* "MySQLVsSQLite.md" contains the reasons for the switch to SQLite.
+* "TrebuchetMarkup.md" contains the design for the markup language to be used to format songs.
+* The "otdb.db" file contains the database in SQLite3 format.
+* The "Database Backups" folder contains various backups of the database.
+* The "RdBF" folder contains the program for adding the contents of the Bible Files from Trebuchet 3.0 to the database.
+* The "WEB" folder within the "RdBF" folder contains the Trebuchet 3.0 Bible Files for the World English Bible translation.
+
 ---
 
 ## Background
