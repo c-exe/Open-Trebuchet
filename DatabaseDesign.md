@@ -102,6 +102,7 @@ Author | TEXT | YES | NO | NULL |    | (255-Character) Author(s) of the song
 Copyright | TEXT | YES | NO | NULL |    | (65535-Character) Copyright information of the song
 SongText | TEXT | YES | NO | NULL |    | (4294967295-Character) Text of the song with markup
 Year | TEXT | YES | NO | NULL |    | (8-Character) Year the song was published
+Flags | INTEGER | NO | NO | 0 |    | 8 flags: 1=Favourite, 2=Hymn, others=?
 
 ```sqlite
 CREATE TABLE Song (
@@ -109,7 +110,8 @@ SongTitle TEXT NOT NULL PRIMARY KEY,
 Author TEXT DEFAULT NULL,
 Copyright TEXT DEFAULT NULL,
 SongText TEXT DEFAULT NULL,
-Year TEXT DEFAULT NULL
+Year TEXT DEFAULT NULL,
+Flags INTEGER NOT NULL DEFAULT 0
 );
 ```
 
