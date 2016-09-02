@@ -1,0 +1,38 @@
+/* Resource file for Menus */
+
+#include "langdef.h"
+#include "resource.h"
+
+#ifndef MENULANG
+#define MENULANG LANG_ENGLISH
+#endif
+
+
+IDR_MAINMENU MENU /* Menu for the main window */
+BEGIN
+
+#if MENULANG == LANG_ENGLISH
+
+    POPUP "&File"
+    BEGIN
+        MENUITEM "E&xit", ID_FILE_EXIT
+    END
+
+#elif MENULANG == LANG_FRANCAIS
+
+    POPUP "&Fichier"
+    BEGIN
+        MENUITEM "&Quitter", ID_FILE_EXIT
+    END
+
+#elif MENULANG == LANG_CYMRAIG
+
+    POPUP "&Ffeil"
+    BEGIN
+        MENUITEM "&Gadael", ID_FILE_EXIT
+    END
+
+#endif
+
+END
+
