@@ -2,11 +2,13 @@
 #include <winuser.h>  //Include User32.lib
 #include <winbase.h>  //Include Kernel32.lib
 #include <winerror.h>
-#include <strsafe.h>
+/*#include <strsafe.h>*/ //Use "safetyfuncs.h" instead
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <tchar.h>
 
+#include "safetyfuncs.h"
 #include "dbfuncs.h"
 
 /* Functions for exchanging song data with the database.  Not to be confused with sqlite3.h/sqlite3.a which is for actually interacting with the database at all. */
@@ -47,7 +49,7 @@ void tescapeapostrophes(LPTSTR outstr, LPTSTR instr)
         if (sptr[0] != _T('\''))
         {
             nsptr = CharNext(sptr);
-            diff = (long) nsptr-sptr;
+            diff = (long) (nsptr-sptr);
             for (k=0; k<diff; k++)
             {
                 outstr[j] = sptr[k];
@@ -98,7 +100,7 @@ void tstripescapedapostrophes(LPTSTR outstr, LPTSTR instr)
     /* TCHAR version of above routine.
        Strip escaped apostrophes from database return.
        Outstr should be at least the size of instr for safety! */
-    long j=0, diff;
+    long j=0, diff, k;
     int lastwasa = 0;
     LPTSTR sptr, nsptr;
     if (instr == NULL || outstr == NULL) return;
@@ -107,7 +109,7 @@ void tstripescapedapostrophes(LPTSTR outstr, LPTSTR instr)
         if (sptr[0] != _T('\''))
         {
             nsptr = CharNext(sptr);
-            diff = (long) nsptr-sptr;
+            diff = (long) (nsptr-sptr);
             for (k=0; k<diff; k++)
             {
                 outstr[j] = sptr[k];
@@ -153,8 +155,9 @@ int tsafestrtoupper(LPTSTR astr, DWORD astrlen)
 {
     /* Safe TCHAR version of above routine.
        Make astr of length astrlen uppercase. */
-    unsigned long alen;
-    if (SUCCEEDED( StringCchLength(astr, (size_t) astrlen, &alen ) != TRUE) return 0;
+    unsigned long alen = (unsigned long) stringchlength(astr, (long) astrlen);
+    /*if (SUCCEEDED( StringCchLength(astr, (size_t) astrlen, &alen ) != TRUE) return 0;*/
+    if (alen<0) return 0;
     if (CharUpperBuff(astr, alen) != alen) return 0;
     return 1;
 }
@@ -187,7 +190,7 @@ void tstripspaces(LPTSTR astr)
         if (sptr[0] != _T(' ') && sptr[0] != _T('\''))
         {
             nsptr = CharNext(sptr);
-            diff = (long) nsptr-sptr;
+            diff = (long) (nsptr-sptr);
             for (k=0; k<diff; k++)
             {
                 astr[j] = sptr[k];
@@ -218,7 +221,7 @@ int tstrleft(LPTSTR outstr, LPTSTR instr, int chars)
        Outstr = chars leftmost characters of instr.
        Outstr should be at least chars+1 characters in size! */
     if (instr == NULL || outstr == NULL) return;
-    if (StringCchCopy(outstr, chars + 1, instr) != STRSAFE_E_INVALID_PARAMETER) return 1;
+    if (stringchcopy(outstr, chars + 1, instr) != SAFETY_INVALID_PARAMETER) return 1;
     return 0;
 }
 
@@ -305,7 +308,7 @@ void stripmarkup(char *outstr, char *instr)
     outstr[j] = 0;
 }
 
-void tstripmarkup(LPTSTR *outstr, LPTSTR *instr)
+void tstripmarkup(LPTSTR outstr, LPTSTR instr)
 {
     /* TCHAR version of above routine.
        Strip all the markup from instr and return as outstr.
@@ -357,7 +360,7 @@ void tstripmarkup(LPTSTR *outstr, LPTSTR *instr)
 
                 default:
                   nsptr = CharNext(sptr);
-                  diff = (long) nsptr-sptr;
+                  diff = (long) (nsptr-sptr);
                   for (k=0; k<diff; k++)
                   {
                     outstr[j] = sptr[k];
@@ -406,8 +409,10 @@ long tsafestrlen(LPTSTR astr)
 {
       /* Safer version of lstrlen - wrapper */
       unsigned long alen;
-      if (SUCCEEDED(StringCchLength( astr, STRSAFE_MAX_CCH, &alen )) == TRUE) return alen;
-      return 0;
+      alen = stringchlength(astr, SAFETY_MAX_CH);
+      if (alen<0) return 0;
+      /*if (SUCCEEDED(StringCchLength( astr, SAFETY_MAX_CH, &alen )) == TRUE) return alen;*/
+      return alen;
 }
 
 void shift4charsleft(char *chars4, char newchar)
@@ -531,7 +536,7 @@ LPTSTR *tslidessplit(LPTSTR songtext)
     for (i=0;songtext[i]!=0;i++)
     {
         tshift4charsleft(last4,songtext[i]);
-        if (streq(last4,_T("\r\n\r\n")) != 0 || streq(last4+(2*sizeof(TCHAR)),_T("\n\n")) != 0)
+        if (tstreq(last4,_T("\r\n\r\n")) != 0 || tstreq(last4+(2*sizeof(TCHAR)),_T("\n\n")) != 0)
         {
             nslides++;
             last4[3] = _T(' ');
@@ -553,7 +558,7 @@ LPTSTR *tslidessplit(LPTSTR songtext)
     for (i=0;songtext[i]!=0;i++)
     {
         tshift4charsleft(last4,songtext[i]);
-        if (streq(last4,_T("\r\n\r\n")) != 0 || streq(last4+(2*sizeof(TCHAR)),_T("\n\n")) != 0)
+        if (tstreq(last4,_T("\r\n\r\n")) != 0 || tstreq(last4+(2*sizeof(TCHAR)),_T("\n\n")) != 0)
         {
             rdslide[j] = 0;
             slides[m] = (LPTSTR) malloc(sizeof(TCHAR)*(1+tsafestrlen(rdslide)));
@@ -565,7 +570,7 @@ LPTSTR *tslidessplit(LPTSTR songtext)
                 return NULL;
             }
             //strcpy(slides[m],rdslide);
-            StringCchCopy(slides[m], (1+tsafestrlen(rdslide)), rdslide);
+            stringchcopy(slides[m], (1+tsafestrlen(rdslide)), rdslide);
             
             m++;
             if (m>=nslides)
@@ -596,7 +601,7 @@ LPTSTR *tslidessplit(LPTSTR songtext)
         return NULL;
     }
     //strcpy(slides[m],rdslide);
-    StringCchCopy(slides[m], (1+tsafestrlen(rdslide)), rdslide);
+    stringchcopy(slides[m], (1+tsafestrlen(rdslide)), rdslide);
     free(rdslide);
     
     return slides;

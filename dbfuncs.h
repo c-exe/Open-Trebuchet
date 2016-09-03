@@ -6,6 +6,7 @@
 #define __DBFUNCS_H__ 1
 
 #include <windows.h>
+#include <tchar.h>
 
 void escapeapostrophes(char *outstr, char *instr);
 void tescapeapostrophes(LPTSTR outstr, LPTSTR instr);
@@ -21,7 +22,7 @@ int tstrleft(LPTSTR outstr, LPTSTR instr, int chars);
 int streq(char *astr, char *bstr);
 int tstreq(LPTSTR astr, LPTSTR bstr);
 void stripmarkup(char *outstr, char *instr);
-void tstripmarkup(LPTSTR *outstr, LPTSTR *instr);
+void tstripmarkup(LPTSTR outstr, LPTSTR instr);
 void firstlineonly(char *astr);
 void tfirstlineonly(LPTSTR astr);
 long tsafestrlen(LPTSTR astr);
