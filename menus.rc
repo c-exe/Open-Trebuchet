@@ -4,6 +4,7 @@
 #include "resource.h"
 
 #ifndef MENULANG
+/* Default to English if no language is defined. */
 #define MENULANG LANG_ENGLISH
 #endif
 
@@ -24,6 +25,8 @@ BEGIN
         MENUITEM "&Project Cued Item\aF9", ID_SHOW_PROJECT
         MENUITEM "&Black Screen\aF10", ID_SHOW_BLACK  /*, CHECKED*/
         MENUITEM "&Clear Screen\aF11", ID_SHOW_CLEAR  /*, CHECKED*/
+        MENUITEM SEPARATOR
+        MENUITEM "Screen Se&ttings...", ID_SHOW_SETTINGS
     END
 
 #elif MENULANG == LANG_FRANCAIS
@@ -39,6 +42,8 @@ BEGIN
         MENUITEM "&Projetez l'Élément Indicé\aF9", ID_SHOW_PROJECT
         MENUITEM "Écran &Noir\aF10", ID_SHOW_BLACK  /*, CHECKED*/
         MENUITEM "Écran P&ropre\aF11", ID_SHOW_CLEAR  /*, CHECKED*/
+        MENUITEM SEPARATOR
+        MENUITEM "Paramè&tres de l'Écran...", ID_SHOW_SETTINGS
     END
 
 #elif MENULANG == LANG_CYMRAIG
@@ -54,6 +59,8 @@ BEGIN
         MENUITEM "&Tafluniwch y Giwio Eitem\aF9", ID_SHOW_PROJECT
         MENUITEM "&Duo y Sgrin\aF10", ID_SHOW_BLACK  /*, CHECKED*/
         MENUITEM "&Cliriwch y Sgrin\aF11", ID_SHOW_CLEAR  /*, CHECKED*/
+        MENUITEM SEPARATOR
+        MENUITEM "&Gosodiadau Sgrin...", ID_SHOW_SETTINGS
     END
 
 #endif
