@@ -5,14 +5,14 @@
 
 #ifndef MENULANG
 /* Default to English if no language is defined. */
-#define MENULANG LANG_ENGLISH
+#define MENULANG _LANG_ENGLISH
 #endif
 
 
 IDR_MAINMENU MENU /* Menu for the main window */
 BEGIN
 
-#if MENULANG == LANG_ENGLISH
+#if MENULANG == _LANG_ENGLISH
 
     POPUP "&File"
     BEGIN
@@ -29,7 +29,7 @@ BEGIN
         MENUITEM "Screen Se&ttings...", ID_SHOW_SETTINGS
     END
 
-#elif MENULANG == LANG_FRANCAIS
+#elif MENULANG == _LANG_FRANCAIS
 
     POPUP "&Fichier"
     BEGIN
@@ -46,7 +46,7 @@ BEGIN
         MENUITEM "Paramè&tres de l'Écran...", ID_SHOW_SETTINGS
     END
 
-#elif MENULANG == LANG_CYMRAIG
+#elif MENULANG == _LANG_CYMRAIG
 
     POPUP "&Ffeil"
     BEGIN

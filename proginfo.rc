@@ -1,10 +1,11 @@
 /* Resource file for program details */
 
+#include <windows.h>
 #include "langdef.h"
 #include "resource.h"
 
 #ifndef INFOLANG
-#define INFOLANG LANG_ENGLISH
+#define INFOLANG _LANG_ENGLISH
 #endif
 
 VS_VERSION_INFO VERSIONINFO
@@ -23,12 +24,12 @@ FILEFLAGS 0
 FILEOS VOS_NT_WINDOWS32
 FILETYPE VFT_APP
 
-#if (INFOLANG == LANG_ENGLISH || INFOLANG == LANG_CYMRAIG)
+#if (INFOLANG == _LANG_ENGLISH || INFOLANG == _LANG_CYMRAIG)
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "080904E4"
-#elif INFOLANG == LANG_FRANCAIS
+#elif INFOLANG == _LANG_FRANCAIS
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -49,9 +50,9 @@ BEGIN
     END
     BLOCK "VarFileInfo"
         BEGIN
-#if (INFOLANG == LANG_ENGLISH || INFOLANG == LANG_CYMRAIG)
+#if (INFOLANG == _LANG_ENGLISH || INFOLANG == _LANG_CYMRAIG)
           VALUE "Translation", 0x0809, 1252
-#elif INFOLANG == LANG_FRANCAIS
+#elif INFOLANG == _LANG_FRANCAIS
           VALUE "Translation", 0x040C, 1252
 #endif
         END
