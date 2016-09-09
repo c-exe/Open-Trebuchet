@@ -2,10 +2,14 @@
 
 CC = gcc
 WINDRES = windres.exe
-ALLOBJS = safetyfuncs.o dbfuncs.o proginfores.o menusres.o
+ALLOBJS = main.o safetyfuncs.o dbfuncs.o proginfores.o menusres.o
+LIBSPECS = -luser32 -lkernel32
 
 ot4.exe: ${ALLOBJS}
-	${CC} ${ALLOBJS} -luser32 -lkernel32 -o ot4.exe
+	${CC} ${ALLOBJS} ${LIBSPECS} -o ot4.exe
+
+main.o: main.c main.h resource.h langdef.h
+	${CC} -c main.c
 
 safetyfuncs.o: safetyfuncs.c safetyfuncs.h
 	${CC} -c safetyfuncs.c
