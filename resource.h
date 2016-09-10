@@ -49,7 +49,7 @@
 #define VER_PRODUCTNAME_STR "Open Trebuchet\0"
 #define VER_FILEDESCRIPTION_STR "Open Trebuchet - Open-source Windows projection software.\0"
 #define VER_INTERNALNAME_STR "ot4\0"
-#define VER_ORIGINALFILENAME_STR "ot4\0"
+#define VER_ORIGINALFILENAME_STR "ot4.exe\0"
 #define VER_LEGALCOPYRIGHT_STR "2016 The Open Trebuchet Project\0"
 #elif INFOLANG == _LANG_FRANCAIS
 #define VER_COMPANYNAME_STR "Le projet Open Trebuchet\0"
@@ -76,6 +76,9 @@
 #define ID_SHOW_BLACK 9004
 #define ID_SHOW_CLEAR 9005
 #define ID_SHOW_SETTINGS 9006
+#define ID_SONG_NEW 9007
+#define ID_SONG_EDITDB 9008
+#define ID_SONG_EDITSCHED 9009
 
 
 #endif

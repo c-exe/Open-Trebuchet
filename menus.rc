@@ -19,9 +19,16 @@ BEGIN
         MENUITEM "E&xit", ID_FILE_EXIT
     END
     
+    POPUP "S&ong"
+    BEGIN
+        MENUITEM "&New Song...", ID_SONG_NEW
+        MENUITEM "Edit Song in &Database...", ID_SONG_EDITDB
+        MENUITEM "Edit Song in &Schedule...", ID_SONG_EDITSCHED
+    END
+    
     POPUP "&Show"
     BEGIN
-        MENUITEM "Display &Screen", ID_SHOW_SCREEN  /*, CHECKED*/
+        MENUITEM "Display &Screen", ID_SHOW_SCREEN, CHECKED
         MENUITEM "&Project Cued Item\aF9", ID_SHOW_PROJECT
         MENUITEM "&Black Screen\aF10", ID_SHOW_BLACK  /*, CHECKED*/
         MENUITEM "&Clear Screen\aF11", ID_SHOW_CLEAR  /*, CHECKED*/
@@ -36,9 +43,16 @@ BEGIN
         MENUITEM "&Quitter", ID_FILE_EXIT
     END
     
+    POPUP "&Chanson"
+    BEGIN
+        MENUITEM "&Nouvelle Chanson...", ID_SONG_NEW
+        MENUITEM "Modifier la Chanson dans la Base de &Données...", ID_SONG_EDITDB
+        MENUITEM "Modifier la Chanson dans le &Barème...", ID_SONG_EDITSCHED
+    END
+    
     POPUP "&Montrer"
     BEGIN
-        MENUITEM "&Affichez l'Écran", ID_SHOW_SCREEN  /*, CHECKED*/
+        MENUITEM "&Affichez l'Écran", ID_SHOW_SCREEN, CHECKED
         MENUITEM "&Projetez l'Élément Indicé\aF9", ID_SHOW_PROJECT
         MENUITEM "Écran &Noir\aF10", ID_SHOW_BLACK  /*, CHECKED*/
         MENUITEM "Écran P&ropre\aF11", ID_SHOW_CLEAR  /*, CHECKED*/
@@ -53,9 +67,16 @@ BEGIN
         MENUITEM "&Gadael", ID_FILE_EXIT
     END
     
+    POPUP "&Cân"
+    BEGIN
+        MENUITEM "Creu Cân &Newydd...", ID_SONG_NEW
+        MENUITEM "Golygu Song yn y Gronfa &Ddata...", ID_SONG_EDITDB
+        MENUITEM "Golygu Song yn yr &Atodlen...", ID_SONG_EDITSCHED
+    END
+    
     POPUP "&Dangos"
     BEGIN
-        MENUITEM "Dangos y &Sgrin", ID_SHOW_SCREEN  /*, CHECKED*/
+        MENUITEM "Dangos y &Sgrin", ID_SHOW_SCREEN, CHECKED
         MENUITEM "&Tafluniwch y Giwio Eitem\aF9", ID_SHOW_PROJECT
         MENUITEM "&Duo y Sgrin\aF10", ID_SHOW_BLACK  /*, CHECKED*/
         MENUITEM "&Cliriwch y Sgrin\aF11", ID_SHOW_CLEAR  /*, CHECKED*/
