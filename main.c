@@ -1,8 +1,10 @@
 #include <windows.h>
+#include <winuser.h> //user32.lib
 #include <tchar.h>
 
 #include "langdef.h"
 #include "resource.h"
+#include "scrnfuns.h"
 
 #include "main.h"
 
@@ -15,6 +17,43 @@ HWND MainWindow = NULL, BigScreen = NULL, SettingsWin = NULL;
 int NScr = 0, ScrX = 0, ScrY = 0, ScrW = 0, ScrH = 0, Scr0W = 0, Scr0H = 0;
 
 
+HWND GetScreenHandle()
+{
+    //Wrapper function
+    return BigScreen;
+}
+
+int GetScrDetails(int ScrDetail)
+{
+    //Wrapper Function
+    switch (ScrDetail)
+    {
+        case SCRD_N: return NScr;
+        case SCRD_X: return ScrX;
+        case SCRD_Y: return ScrY;
+        case SCRD_W: return ScrW;
+        case SCRD_H: return ScrH;
+        case SCRD_0W: return Scr0W;
+        case SCRD_0H: return Scr0H;
+    }
+    return 0;
+}
+
+UINT GetWindowShowState(HWND hwnd)
+{
+    WINDOWPLACEMENT wp;
+
+    wp.length = sizeof(WINDOWPLACEMENT);
+    if (GetWindowPlacement(hwnd, &wp))
+    {
+        return wp.showCmd;
+    }
+    else
+    {
+        return BAD_SHOW_STATE;
+    }
+}
+
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -25,6 +64,61 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         case WM_DESTROY:
           PostQuitMessage(0);
+        break;
+
+        case WM_COMMAND:
+            switch(LOWORD(wParam))
+            {
+                case ID_FILE_EXIT:
+                    PostMessage(hwnd, WM_CLOSE, 0, 0);
+                break;
+
+                case ID_SHOW_SCREEN:
+                {
+                    MENUITEMINFO mii;
+                    ZeroMemory(&mii, sizeof(MENUITEMINFO));
+                    mii.cbSize = sizeof(MENUITEMINFO);
+                    mii.fMask = MIIM_STATE;
+                    if (!(GetMenuItemInfo(GetMenu(hwnd), ID_SHOW_SCREEN, FALSE, &mii)))
+                    {
+                        MessageBox(hwnd, _T("Failed to get menu item state!"), _T("Error Showing/Hiding Screen!"), MB_ICONERROR | MB_OK);
+                        break;
+                    }
+                    
+                    //UINT NewShowState;//, CurrentShowState = GetWindowShowState(BigScreen);
+                    BOOL NewWindowVisibility;
+                    BOOL WindowVisibility = IsWindowVisible(BigScreen);  //Rewrite all this to use SetWindowPos to
+                                                                         //change visibility
+                    
+                    if (WindowVisibility == FALSE)
+                    {
+                        mii.fState |= MFS_CHECKED;
+                        NewWindowVisibility = TRUE;
+                        //NewShowState = SW_SHOWDEFAULT; //SW_SHOW; //SW_SHOWNOACTIVATE;
+                        //MessageBox(hwnd, _T("Window was hidden"), _T("Ping!"), MB_OK);
+                    }
+                    else
+                    {
+                        mii.fState &= (~MFS_CHECKED);
+                        //NewShowState = SW_HIDE;
+                        NewWindowVisibility = FALSE;
+                    }
+
+                    //if (!(ShowWindow(BigScreen, NewShowState)))
+                    if (!(ShowHideScreen(NewWindowVisibility)))
+                    {
+                        MessageBox(hwnd, _T("Failed to change screen window show-state!"), _T("Error Showing/Hiding Screen!"), MB_ICONERROR | MB_OK);
+                        break;
+                    }
+                    UpdateWindow(BigScreen);
+                    if (!(SetMenuItemInfo(GetMenu(hwnd), ID_SHOW_SCREEN, FALSE, &mii)))
+                    {
+                        MessageBox(hwnd, _T("Failed to set menu item state!"), _T("Error Showing/Hiding Screen!"), MB_ICONERROR | MB_OK);
+                        break;
+                    }
+                }
+                break;
+            }
         break;
 
         default:
@@ -74,6 +168,7 @@ LRESULT CALLBACK ScreenWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         case WM_PAINT:
         {
             //PaintBS();
+            return DefWindowProc(hwnd, msg, wParam, lParam);
         }
         break;
 
@@ -176,6 +271,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   SetWindowLong(hswnd, GWL_STYLE, 0);
   ShowWindow(hswnd, nCmdShow);
   UpdateWindow(hswnd);
+  AutoPositionScreen();
+
+  SetForegroundWindow(hmwnd);
 
   //Message Loop
   BOOL GMsg;
