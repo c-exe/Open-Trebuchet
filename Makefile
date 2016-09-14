@@ -2,8 +2,8 @@
 
 CC = gcc
 WINDRES = windres.exe
-ALLOBJS = main.o safetyfuncs.o dbfuncs.o scrnfuns.o proginfores.o menusres.o
-LIBSPECS = -luser32 -lkernel32 -lgdi32
+ALLOBJS = main.o safetyfuncs.o dbfuncs.o scrnfuns.o proginfores.o menusres.o dbinsert.o
+LIBSPECS = -luser32 -lkernel32 -lgdi32 -lsqlite3
 
 ot4.exe: ${ALLOBJS}
 	${CC} ${ALLOBJS} ${LIBSPECS} -o ot4.exe
@@ -20,6 +20,9 @@ safetyfuncs.o: safetyfuncs.c safetyfuncs.h
 
 dbfuncs.o: dbfuncs.c dbfuncs.h safetyfuncs.h
 	${CC} -c dbfuncs.c
+
+dbinsert.o: dbinsert.c dbinsert.h main.h resource.h dbfuncs.h
+	${CC} -c dbinsert.c
 
 proginfores.o: proginfo.rc resource.h langdef.h
 	${WINDRES} -O coff proginfo.rc proginfores.o

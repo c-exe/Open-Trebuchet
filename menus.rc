@@ -22,8 +22,8 @@ BEGIN
     POPUP "S&ong"
     BEGIN
         MENUITEM "&New Song...", ID_SONG_NEW
-        MENUITEM "Edit Song in &Database...", ID_SONG_EDITDB
-        MENUITEM "Edit Song in &Schedule...", ID_SONG_EDITSCHED
+        MENUITEM "Edit Song in &Database...", ID_SONG_EDITDB, GRAYED
+        MENUITEM "Edit Song in &Schedule...", ID_SONG_EDITSCHED, GRAYED
     END
     
     POPUP "&Show"
@@ -36,6 +36,11 @@ BEGIN
         MENUITEM "Screen Se&ttings...", ID_SHOW_SETTINGS
     END
 
+    POPUP "&Database"
+    BEGIN
+        MENUITEM "&Clean up Database", ID_DATABASE_CLEAN
+    END
+
 #elif MENULANG == _LANG_FRANCAIS
 
     POPUP "&Fichier"
@@ -46,8 +51,8 @@ BEGIN
     POPUP "&Chanson"
     BEGIN
         MENUITEM "&Nouvelle Chanson...", ID_SONG_NEW
-        MENUITEM "Modifier la Chanson dans la Base de &Données...", ID_SONG_EDITDB
-        MENUITEM "Modifier la Chanson dans le &Barème...", ID_SONG_EDITSCHED
+        MENUITEM "Modifier la Chanson dans la Base de &Données...", ID_SONG_EDITDB, GRAYED
+        MENUITEM "Modifier la Chanson dans le &Barème...", ID_SONG_EDITSCHED, GRAYED
     END
     
     POPUP "&Montrer"
@@ -60,6 +65,11 @@ BEGIN
         MENUITEM "Paramè&tres de l'Écran...", ID_SHOW_SETTINGS
     END
 
+    POPUP "Base de &Données"
+    BEGIN
+        MENUITEM "&Nettoyer la Base de Données", ID_DATABASE_CLEAN
+    END
+
 #elif MENULANG == _LANG_CYMRAIG
 
     POPUP "&Ffeil"
@@ -70,8 +80,8 @@ BEGIN
     POPUP "&Cân"
     BEGIN
         MENUITEM "Creu Cân &Newydd...", ID_SONG_NEW
-        MENUITEM "Golygu Song yn y Gronfa &Ddata...", ID_SONG_EDITDB
-        MENUITEM "Golygu Song yn yr &Atodlen...", ID_SONG_EDITSCHED
+        MENUITEM "Golygu Song yn y Gronfa &Ddata...", ID_SONG_EDITDB, GRAYED
+        MENUITEM "Golygu Song yn yr &Atodlen...", ID_SONG_EDITSCHED, GRAYED
     END
     
     POPUP "&Dangos"
@@ -82,6 +92,11 @@ BEGIN
         MENUITEM "&Cliriwch y Sgrin\aF11", ID_SHOW_CLEAR  /*, CHECKED*/
         MENUITEM SEPARATOR
         MENUITEM "&Gosodiadau Sgrin...", ID_SHOW_SETTINGS
+    END
+
+    POPUP "Cronfa &Ddata"
+    BEGIN
+        MENUITEM "&Glanhewch Cronfa Ddata", ID_DATABASE_CLEAN
     END
 
 #endif

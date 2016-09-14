@@ -7,11 +7,144 @@
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
+#include <sqlite3.h>
 
 #include "safetyfuncs.h"
 #include "dbfuncs.h"
 
 /* Functions for exchanging song data with the database.  Not to be confused with sqlite3.h/sqlite3.a which is for actually interacting with the database at all. */
+
+char *TCHARToUTF8(TCHAR c)
+{
+    char *utf8 = (char *) malloc(5*sizeof(char));
+    if (utf8 == NULL) return NULL;
+    if ((int) c < 128)
+    {
+        utf8[0] = (char) c;
+        utf8[1] = 0;
+    }
+#ifdef _UNICODE
+    //Treat as UTF16LE
+    else if ((int) c < 0x0800)
+    {
+        utf8[0] = ((((int) c) & 0x7C0) >> 6) | 192;
+        utf8[1] = (((int) c) & 0x3F) | 128;
+        utf8[2] = 0;
+    }
+    else
+    {
+        utf8[0] = ((((int) c) & 0xF000) >> 12) | 0xE0;
+        utf8[1] = ((((int) c) & 0x0FC0) >> 6) | 0x80;
+        utf8[2] = ((((int) c) & 0x003F) | 128);
+        utf8[3] = 0;
+    }
+#else
+    //Treat as ANSI
+    else
+    {
+        utf8[0] = ((((int) c) & 192) >> 6) | 192;
+        utf8[1] = (((int) c) & 0x3F) | 128;
+        utf8[2] = 0;
+    }
+#endif
+    return utf8;
+}
+
+int TSTRToUTF8Str(char *utf8str, LPTSTR tstr)
+{
+    /* utf8str should be 3x tstr for safety! */
+    TCHAR c;
+    char *u;
+    long i;
+    utf8str[0] = 0;
+    for (i=0;tstr[i] != 0;i++)
+    {
+        c = tstr[i];
+        u = TCHARToUTF8(c);
+        if (u==NULL) return 0;
+        strcat(utf8str,u);
+        free(u);
+    }
+    return 1;
+}
+
+void UTF8StrToTSTR(LPTSTR tstr, char *utf8str, TCHAR unknownchar)
+{
+    /* Ensure tstr >= len(utf8str)! */
+    int i = 0, j=0;
+    char u1, u2, u3, u4;
+    TCHAR c;
+    tstr[0] = 0;
+    while (utf8str[i] != 0)
+    {
+        u1 = utf8str[i];
+        if (u1>127)
+        {
+            if (u1<0xC0) break;
+            i++;
+            if (utf8str[i] == 0) break;
+            u2 = utf8str[i];
+            if (u2>127)
+            {
+                if (u1<0xE0) break;
+                i++;
+                if (utf8str[i] == 0) break;
+                u3 = utf8str[i];
+                if (u3>127)
+                {
+                    if (u1<0xF0) break;
+                    i++;
+                    if (utf8str[i] == 0) break;
+                    u4 = utf8str[i];
+                    //WCHAR doesn't support this size!
+                    tstr[j] = unknownchar;
+                    j++;
+                }
+                else //3 chars
+                {
+#ifdef _UNICODE
+                    //Build WCHAR
+                    c = (TCHAR) ((u3 & 0x3F) | ((u2 & 0x3F) << 6) | ((u1 & 0x0F) << 12));
+                    tstr[j] = c;
+#else
+                    //ANSI doesn't support this size!
+                    tstr[j] = unknownchar;
+#endif
+                    j++;
+                }
+            }
+            else //2 chars
+            {
+#ifdef _UNICODE
+                //Build WCHAR
+                c = (TCHAR) ((u2 & 0x3F) | ((u1 & 0x1F) << 6));
+                tstr[j] = c;
+#else
+                //Build ANSI if possible
+                if (u1>0xC3)
+                {
+                    //ANSI doesn't support this size!
+                    tstr[j] = unknownchar;
+                }
+                else
+                {
+                    c = (TCHAR) ((u2 & 0x3F) | ((u1 & 0x03) << 6));
+                    tstr[j] = c;
+                }
+#endif
+                j++;
+            }
+        }
+        else //1 char
+        {
+            c = (TCHAR) (u1 & 0x7F);
+            tstr[j] = c;
+            j++;
+        }
+        i++;
+    }
+    tstr[j] = 0;
+}
 
 void escapeapostrophes(char *outstr, char *instr)
 {
@@ -64,6 +197,37 @@ void tescapeapostrophes(LPTSTR outstr, LPTSTR instr)
         }
     }
     outstr[j] = 0;
+}
+
+int tescapeforlike(LPTSTR outstr, LPTSTR instr)
+{
+    /* Ensure outstr is at least 4x instr */
+    if (instr==NULL || outstr==NULL) return 0;
+    LPTSTR tstr = (LPTSTR) malloc(sizeof(TCHAR)*(_tcslen(instr)+1)*2);
+    if (tstr == NULL) return 0;
+    escapeapostrophes(tstr, instr);
+    long i, j=0;
+    for (i=0;tstr[i]!=0;i++)
+    {
+        switch (tstr[i])
+        {
+            case _T('%'):
+            case _T('_'):
+            case _T('\\'):
+              outstr[j] = _T('\\');
+              outstr[j+1] = tstr[i];
+              j+=2;
+            break;
+
+            default:
+              outstr[j] = tstr[i];
+              j++;
+            break;
+        }
+    }
+    outstr[j] = 0;
+    free(tstr);
+    return 1;
 }
 
 void stripescapedapostrophes(char *outstr, char *instr)
@@ -606,3 +770,5 @@ LPTSTR *tslidessplit(LPTSTR songtext)
     
     return slides;
 }
+
+

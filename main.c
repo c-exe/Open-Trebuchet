@@ -11,6 +11,8 @@
 const char gwMClassName[] = "MainWindowClass";
 const char gwSClassName[] = "ScreenWindowClass";
 
+TCHAR TestString[] = _T("This is a \ttest.");
+
 OSVERSIONINFO osv;
 
 HWND MainWindow = NULL, BigScreen = NULL, SettingsWin = NULL;
@@ -39,6 +41,21 @@ int GetScrDetails(int ScrDetail)
     return 0;
 }
 
+BOOL AddItemToListBox(int AListBox, LPTSTR ItemText)
+{
+        TCHAR errtxt[1024];
+    HWND hLB = GetDlgItem(MainWindow, AListBox);
+    if (hLB==NULL)
+    {
+        _stprintf(errtxt,_T("Error %lu adding '%s' to listbox!"),GetLastError(),ItemText);
+        MessageBox(NULL, errtxt, _T("ListBox Error!"), MB_OK);
+        return FALSE;
+    }
+    LRESULT res = SendMessage(hLB, LB_ADDSTRING, 0, (LPARAM) ItemText);
+    if (res == LB_ERR || res == LB_ERRSPACE) return FALSE;
+    return TRUE;
+}
+
 UINT GetWindowShowState(HWND hwnd)
 {
     WINDOWPLACEMENT wp;
@@ -58,6 +75,43 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
+        case WM_CREATE:
+        {
+            HFONT hfDefault;
+            HWND hSchedLB, hSongLB;
+
+            MainWindow = hwnd;
+            
+            hSchedLB = CreateWindowEx(WS_EX_CLIENTEDGE, "LISTBOX", "", WS_CHILD | WS_VSCROLL | WS_TABSTOP |
+                                      WS_VISIBLE | LBS_HASSTRINGS | LBS_USETABSTOPS | LBS_WANTKEYBOARDINPUT,
+                                      0, 0, 100, 100, hwnd, (HMENU) IDC_SCHEDULE_LISTBOX,
+                                      GetModuleHandle(NULL), NULL);
+            if (hSchedLB == NULL)
+            {
+                MessageBox(hwnd, _T("Could not create Schedule List Box!"), _T("Error Creating Components!"), MB_OK | MB_ICONERROR);
+                break;
+            }
+            hfDefault = GetStockObject(DEFAULT_GUI_FONT);
+            SendMessage(hSchedLB, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
+
+            hSongLB = CreateWindowEx(WS_EX_CLIENTEDGE, "LISTBOX", _T(""), WS_CHILD | WS_VSCROLL | WS_TABSTOP |
+                                      WS_VISIBLE | LBS_HASSTRINGS | LBS_USETABSTOPS | LBS_WANTKEYBOARDINPUT,
+                                      0, 100, 100, 100, hwnd, (HMENU) IDC_SONGS_LISTBOX,
+                                      GetModuleHandle(NULL), NULL);
+            if (hSongLB == NULL)
+            {
+                MessageBox(hwnd, _T("Could not create Songs List Box!"), _T("Error Creating Components!"), MB_OK | MB_ICONERROR);
+                break;
+            }
+            SendMessage(hSongLB, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
+            SendMessage(hSongLB, LB_ADDSTRING, 0, (LPARAM) TestString);
+            
+            SongLBSuck(NULL, FALSE, TRUE, TRUE, TRUE, TRUE);
+            AddItemToListBox(IDC_SONGS_LISTBOX, _T("A Second Test"));
+        }
+        break;
+        
+        
         case WM_CLOSE:
           DestroyWindow(hwnd);
         break;
@@ -95,7 +149,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                         mii.fState |= MFS_CHECKED;
                         NewWindowVisibility = TRUE;
                         //NewShowState = SW_SHOWDEFAULT; //SW_SHOW; //SW_SHOWNOACTIVATE;
-                        //MessageBox(hwnd, _T("Window was hidden"), _T("Ping!"), MB_OK);
                     }
                     else
                     {
@@ -218,7 +271,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   mwc.hInstance = hInstance;
   mwc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
   mwc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  mwc.hbrBackground = (HBRUSH) (COLOR_WINDOW+1);
+  mwc.hbrBackground = (HBRUSH) (COLOR_BTNFACE+1); //(COLOR_WINDOW+1);
   mwc.lpszMenuName = MAKEINTRESOURCE(IDR_MAINMENU);
   mwc.lpszClassName = gwMClassName;
   mwc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);

@@ -17,6 +17,7 @@
 
 HWND GetScreenHandle();
 int GetScrDetails(int ScrDetail);
+BOOL AddItemToListBox(int AListBox, LPTSTR ItemText);
 UINT GetWindowShowState(HWND hwnd);
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK ScreenWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
