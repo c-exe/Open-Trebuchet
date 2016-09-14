@@ -52,12 +52,12 @@
 #define VER_ORIGINALFILENAME_STR "ot4.exe\0"
 #define VER_LEGALCOPYRIGHT_STR "2016 The Open Trebuchet Project\0"
 #elif INFOLANG == _LANG_FRANCAIS
-#define VER_COMPANYNAME_STR "Le projet Open Trebuchet\0"
+#define VER_COMPANYNAME_STR "Le Projet Open Trebuchet\0"
 #define VER_PRODUCTNAME_STR "Open Trebuchet\0"
 #define VER_FILEDESCRIPTION_STR "Open Trebuchet - Open-source du logiciel de projection de Windows.\0"
 #define VER_INTERNALNAME_STR "ot4\0"
 #define VER_ORIGINALFILENAME_STR "ot4\0"
-#define VER_LEGALCOPYRIGHT_STR "2016 Le projet Open Trebuchet\0"
+#define VER_LEGALCOPYRIGHT_STR "2016 Le Projet Open Trebuchet\0"
 #elif INFOLANG == _LANG_CYMRAIG
 #define VER_COMPANYNAME_STR "Mae'r Prosiect Open Trebuchet\0"
 #define VER_PRODUCTNAME_STR "Open Trebuchet\0"
@@ -80,6 +80,12 @@
 #define ID_SONG_EDITDB 9008
 #define ID_SONG_EDITSCHED 9009
 #define ID_DATABASE_CLEAN 9010
+#define ID_DATABASE_SONGS_FAVS 9011
+#define ID_DATABASE_SHOW_SONGS 9012
+#define ID_DATABASE_SHOW_HYMNS 9013
+#define ID_DATABASE_SHOW_LIT 9014
+#define ID_DATABASE_SHOW_META 9015
+#define ID_FILE_NEWSCHEDULE 9016
 
 #define IDC_SCHEDULE_LISTBOX 201
 #define IDC_SONGS_LISTBOX 202

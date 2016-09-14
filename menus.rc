@@ -16,6 +16,7 @@ BEGIN
 
     POPUP "&File"
     BEGIN
+        MENUITEM "&New Schedule", ID_FILE_NEWSCHEDULE
         MENUITEM "E&xit", ID_FILE_EXIT
     END
     
@@ -38,6 +39,14 @@ BEGIN
 
     POPUP "&Database"
     BEGIN
+        POPUP "Display &Songs"
+        BEGIN
+            MENUITEM "Show Only &Favourites", ID_DATABASE_SONGS_FAVS /*, CHECKED*/
+            MENUITEM "Show &Songs", ID_DATABASE_SHOW_SONGS, CHECKED
+            MENUITEM "Show &Hymns", ID_DATABASE_SHOW_HYMNS, CHECKED
+            MENUITEM "Show &Liturgy", ID_DATABASE_SHOW_LIT, CHECKED
+            MENUITEM "Show &Meta Items", ID_DATABASE_SHOW_META, CHECKED
+        END
         MENUITEM "&Clean up Database", ID_DATABASE_CLEAN
     END
 
@@ -45,6 +54,7 @@ BEGIN
 
     POPUP "&Fichier"
     BEGIN
+        MENUITEM "&Nouveau Programme", ID_FILE_NEWSCHEDULE
         MENUITEM "&Quitter", ID_FILE_EXIT
     END
     
@@ -67,6 +77,14 @@ BEGIN
 
     POPUP "Base de &Données"
     BEGIN
+        POPUP "Afficher &Chansons"
+        BEGIN
+            MENUITEM "Afficher Uniquement les &Favoris", ID_DATABASE_SONGS_FAVS /*, CHECKED*/
+            MENUITEM "Afficher &Chansons", ID_DATABASE_SHOW_SONGS, CHECKED
+            MENUITEM "Afficher &Hymns", ID_DATABASE_SHOW_HYMNS, CHECKED
+            MENUITEM "Afficher &Liturgie", ID_DATABASE_SHOW_LIT, CHECKED
+            MENUITEM "Afficher &Meta Articles", ID_DATABASE_SHOW_META, CHECKED
+        END
         MENUITEM "&Nettoyer la Base de Données", ID_DATABASE_CLEAN
     END
 
@@ -74,6 +92,7 @@ BEGIN
 
     POPUP "&Ffeil"
     BEGIN
+        MENUITEM "Atodlen &Newydd", ID_FILE_NEWSCHEDULE
         MENUITEM "&Gadael", ID_FILE_EXIT
     END
     
@@ -96,6 +115,14 @@ BEGIN
 
     POPUP "Cronfa &Ddata"
     BEGIN
+        POPUP "&Caneuon Arddangos"
+        BEGIN
+            MENUITEM "Dangos yn Unig &Ffefrynnau", ID_DATABASE_SONGS_FAVS /*, CHECKED*/
+            MENUITEM "Dangos &Caneuon", ID_DATABASE_SHOW_SONGS, CHECKED
+            MENUITEM "Dangos &Emynau", ID_DATABASE_SHOW_HYMNS, CHECKED
+            MENUITEM "Dangos &Litwrgi", ID_DATABASE_SHOW_LIT, CHECKED
+            MENUITEM "Dangos Eitemau &Meta", ID_DATABASE_SHOW_META, CHECKED
+        END
         MENUITEM "&Glanhewch Cronfa Ddata", ID_DATABASE_CLEAN
     END
 
