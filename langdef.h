@@ -11,8 +11,6 @@
 
 /* ------------- Define chosen languages below this point ------------- */
 
-#define MENULANG _LANG_ENGLISH
-#define DIALOGUELANG _LANG_ENGLISH
-#define INFOLANG _LANG_ENGLISH
+#include "langspec.h"
 
 #endif
