@@ -3,12 +3,39 @@ Open-source church projection software for Windows.
 
 ## Files
 
+### Documentation
+
 * "README.md" is this file.
 * "DatabaseDesign.md" contains the design of the database.
 * "DatabaseDesignForMySQL.md" contains the old design of the database from when it was going to be implemented in MySQL.
 * "MySQLVsSQLite.md" contains the reasons for the switch to SQLite.
 * "TrebuchetMarkup.md" contains the design for the markup language to be used to format songs.
+
+### Source Code
+
+* "dbfuncs.c" is where the functions are for preparing data to be exchanged with the database.
+* "dbfuncs.h" is the header file for "dbfuncs.c".
+* "dbinsert.c" is where the functions are for inserting data from the database into the various listboxes etc in the main program.
+* "dbinsert.h" is the header file for "dbinsert.c".
+* "langspec.h" is where you specify what (human) language you want the finished program to use.  Edit this file if your target is in a non-English speaking region.  If you are developing for the project, do not #include this file!  Use "langdef.h" instead.
+* "langdef.h" is where the languages are defined.
+* "main.c" is the main body of code.  It's where WinMain is, along with the functions for running the windows.
+* "main.h" is the header file for "main.c".
+* "Makefile" is the Makefile for the project.
+* "menus.rc" is the resource file where the menu system for the windows is defined.
+* "proginfo.rc" is the resource file where the program information is defined.
+* "resource.h" holds the resource definitions for the RC files and the controls.
+* "safetyfuncs.c" is essentially a bunch of functions that replace the "strsafe.h" functions needed by the program.  "strsafe.h" is not available for MinGW so this file is needed.
+* "safetyfuncs.h" is the header file for "safetyfuncs.c".
+* "scrnfuns.c" is where the functions for managing the Screen Window are held.
+* "scrnfuns.h" is the header file for "scrnfuns.c".
+
+### Final files
+
 * The "otdb.db" file contains the database in SQLite3 format.
+
+### Subfolders
+
 * The "Database Backups" folder contains various backups of the database.
 * The "RdBF" folder contains the program for adding the contents of the Bible Files from Trebuchet 3.0 to the database.
 * The "WEB" folder within the "RdBF" folder contains the Trebuchet 3.0 Bible Files for the World English Bible translation.
