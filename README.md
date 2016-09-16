@@ -17,6 +17,8 @@ Open-source church projection software for Windows.
 * "dbfuncs.h" is the header file for "dbfuncs.c".
 * "dbinsert.c" is where the functions are for inserting data from the database into the various listboxes etc in the main program.
 * "dbinsert.h" is the header file for "dbinsert.c".
+* "errmsgs.c" contains the routines for producing and defining error messages.
+* "errmsgs.h" contains definitions of some error messages and is the header file for "errormsgs.c".
 * "langspec.h" is where you specify what (human) language you want the finished program to use.  Edit this file if your target is in a non-English speaking region.  If you are developing for the project, do not #include this file!  Use "langdef.h" instead.
 * "langdef.h" is where the languages are defined.
 * "main.c" is the main body of code.  It's where WinMain is, along with the functions for running the windows.
