@@ -2,7 +2,8 @@
 
 #ifndef __LANGDEF_H__
 
-#define __LANGDEF_H__
+#define __LANGDEF_H__ 1
+
 
 #define _LANG_ENGLISH 1
 #define _LANG_FRANCAIS 2
