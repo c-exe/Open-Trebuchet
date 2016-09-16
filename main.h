@@ -21,6 +21,7 @@ BOOL AddItemToListBox(int AListBox, LPTSTR ItemText);
 UINT GetWindowShowState(HWND hwnd);
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK ScreenWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL ShowHideWindow(HWND AWindow, BOOL ShowWindow);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
 
 
