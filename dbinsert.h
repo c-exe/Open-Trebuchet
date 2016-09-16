@@ -14,7 +14,9 @@
 #include <windows.h>
 
 static int songcallback(void *NotUsed, int argc, char **argv, char **azColName);
+static int songflcallback(void *NotUsed, int argc, char **argv, char **azColName);
 int SongLBSuck(LPTSTR SongFilter, BOOL FavOnly, BOOL IncSong, BOOL IncHymn, BOOL IncLit, BOOL IncMeta);
+int SongFLLBSuck(LPTSTR SongFLFilter, BOOL FavOnly, BOOL IncSong, BOOL IncHymn, BOOL IncLit, BOOL IncMeta);
 
 
 #endif

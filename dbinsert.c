@@ -8,6 +8,7 @@
 #include "resource.h"
 #include "main.h"
 #include "dbfuncs.h"
+#include "errmsgs.h"
 
 #include "dbinsert.h"
 
@@ -22,7 +23,6 @@ static int songcallback(void *NotUsed, int argc, char **argv, char **azColName)
      2: Use UTF8StrToTSTR(LPTSTR tstr, char *utf8str, TCHAR unknownchar) to convert
      3: Use BOOL AddItemToListBox(IDC_SONGS_LISTBOX, LPTSTR ItemText) to add
      4: repeat until done! */
-  titleoffset = -1;
   for(i=0; i<argc; i++)
   {
       if (streq(azColName[i], "Flags") && argv[i] != NULL)
@@ -38,12 +38,12 @@ static int songcallback(void *NotUsed, int argc, char **argv, char **azColName)
   }
   if (titleoffset == -1) return 0; //Not an error, just skip this record
 
-  utf8list = (char *) malloc(sizeof(char) * (4+strlen(argv[titleoffset])));
+  utf8list = (char *) malloc(sizeof(char) * (5+strlen(argv[titleoffset])));
   if (utf8list == NULL) return -1;
 
-  if (isfav!=0) strcpy(utf8list,"F: "); else strcpy(utf8list,"_: ");
-  strcat(utf8list, argv[titleoffset]);
-
+  strcpy(utf8list, argv[titleoffset]);
+  if (isfav!=0) strcat(utf8list," (F)"); //else strcat(utf8list,"_: ");
+  
   itemtext = (LPTSTR) malloc(sizeof(TCHAR) * (1+strlen(utf8list)));
   if (itemtext == NULL)
   {
@@ -54,6 +54,44 @@ static int songcallback(void *NotUsed, int argc, char **argv, char **azColName)
   free(utf8list);
 
   if (AddItemToListBox(IDC_SONGS_LISTBOX, itemtext) == FALSE)
+  {
+      free(itemtext);
+      return -1;
+  }
+
+  free(itemtext);
+  
+  return 0;
+}
+
+static int songflcallback(void *NotUsed, int argc, char **argv, char **azColName)
+{
+  int i;
+  int floffset = -1;
+  char *utf8list = NULL;
+  LPTSTR itemtext = NULL;
+  /* 1: get the columns
+     2: Use UTF8StrToTSTR(LPTSTR tstr, char *utf8str, TCHAR unknownchar) to convert
+     3: Use BOOL AddItemToListBox(IDC_SONGS_LISTBOX, LPTSTR ItemText) to add
+     4: repeat until done! */
+  for(i=0; i<argc; i++)
+  {
+      if (streq(azColName[i], "FLine") && argv[i] != NULL)
+      {
+          floffset = i;
+      }
+  }
+  if (floffset == -1) return 0; //Not an error, just skip this record
+
+  itemtext = (LPTSTR) malloc(sizeof(TCHAR) * (1+strlen(argv[floffset])));
+  if (itemtext == NULL)
+  {
+      return -1;
+  }
+  UTF8StrToTSTR(itemtext,argv[floffset],_T('?'));
+  free(utf8list);
+
+  if (AddItemToListBox(IDC_SONGFIRSTLINES_LISTBOX, itemtext) == FALSE)
   {
       free(itemtext);
       return -1;
@@ -83,9 +121,9 @@ int SongLBSuck(LPTSTR SongFilter, BOOL FavOnly, BOOL IncSong, BOOL IncHymn, BOOL
         if (AnErrMsg != NULL)
         {
             sprintf(AnErrMsg, "Cannot open database: %s.", sqlite3_errmsg(db));
-            MessageBoxA(NULL, AnErrMsg, "Database Error!", MB_ICONERROR | MB_OK);
+            exterrmsgA(NULL, ERR_CAT_DB, AnErrMsg);
             free(AnErrMsg);
-        } else MessageBoxA(NULL, "Cannot open database.", "Database Error!", MB_ICONERROR | MB_OK);
+        } else doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOPEN);
         sqlite3_close(db);
         return 0;
     }
@@ -94,13 +132,13 @@ int SongLBSuck(LPTSTR SongFilter, BOOL FavOnly, BOOL IncSong, BOOL IncHymn, BOOL
         EscSF = (TCHAR *) malloc(sizeof(TCHAR)*(4*(1+1+_tcslen(SongFilter))));
         if (EscSF == NULL)
         {
-            MessageBoxA(NULL, "Out of Memory!", "Database Error!", MB_ICONERROR | MB_OK);
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOOM);
             sqlite3_close(db);
             return 0;
         }
         if (tescapeforlike(EscSF,SongFilter) == 0)
         {
-            MessageBoxA(NULL, "Error Converting Filter!", "Database Error!", MB_ICONERROR | MB_OK);
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBCONVFILTER);
             free(EscSF);
             sqlite3_close(db);
             return 0;
@@ -110,14 +148,14 @@ int SongLBSuck(LPTSTR SongFilter, BOOL FavOnly, BOOL IncSong, BOOL IncHymn, BOOL
         SFUTF8 = (char *) malloc(sizeof(char)*(3*(1+_tcslen(EscSF))));
         if (SFUTF8 == NULL)
         {
-            MessageBoxA(NULL, "Out of Memory!", "Database Error!", MB_ICONERROR | MB_OK);
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOOM);
             free(EscSF);
             sqlite3_close(db);
             return 0;
         }
         if (TSTRToUTF8Str(SFUTF8,EscSF) == 0)
         {
-            MessageBoxA(NULL, "Out of Memory!", "Database Error!", MB_ICONERROR | MB_OK);
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOOM);
             free(EscSF);
             free(SFUTF8);
             sqlite3_close(db);
@@ -206,12 +244,215 @@ int SongLBSuck(LPTSTR SongFilter, BOOL FavOnly, BOOL IncSong, BOOL IncHymn, BOOL
         {
             if (zErrMsg != NULL) sprintf(AnErrMsg, "SQL error: %s.", zErrMsg);
             else strcpy(AnErrMsg, "Unknown Database Error!");
-            MessageBoxA(NULL, AnErrMsg, "Database Error!", MB_ICONERROR | MB_OK);
+            exterrmsgA(NULL, ERR_CAT_DB, AnErrMsg);
             free(AnErrMsg);
         }
         else
         {
-            MessageBoxA(NULL, "SQL Error!", "Database Error!", MB_ICONERROR | MB_OK);
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBSQL);
+        }
+        sqlite3_free(zErrMsg);
+        sqlite3_close(db);
+        return 0;
+    }
+    sqlite3_close(db);
+    return 1;
+}
+
+int SongFLLBSuck(LPTSTR SongFLFilter, BOOL FavOnly, BOOL IncSong, BOOL IncHymn, BOOL IncLit, BOOL IncMeta)
+{
+    sqlite3 *db;
+    char *AnErrMsg = NULL;
+    char *zErrMsg = NULL;
+    char *SFLFUTF8 = NULL;
+    LPTSTR EscSFLF = NULL;
+    char SQLStatement[3072] = "";
+    char WhereStatement[2048] = "";
+    char FlagStatement[256] = "";
+    int rc;
+
+    rc = sqlite3_open(DB_FILENAME, &db); //Do something about this, it should not be hardcoded like this!
+    if( rc )
+    {
+        AnErrMsg = (char *) malloc(2048*sizeof(char));
+        if (AnErrMsg != NULL)
+        {
+            sprintf(AnErrMsg, "Cannot open database: %s.", sqlite3_errmsg(db));
+            exterrmsgA(NULL, ERR_CAT_DB, AnErrMsg);
+            free(AnErrMsg);
+        } else doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOPEN);
+        sqlite3_close(db);
+        return 0;
+    }
+    if (SongFLFilter != NULL && SongFLFilter[0] != 0)
+    {
+        EscSFLF = (TCHAR *) malloc(sizeof(TCHAR)*(4*(1+1+_tcslen(SongFLFilter))));
+        if (EscSFLF == NULL)
+        {
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOOM);
+            sqlite3_close(db);
+            return 0;
+        }
+        if (tescapeforlike(EscSFLF,SongFLFilter) == 0)
+        {
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBCONVFILTER);
+            free(EscSFLF);
+            sqlite3_close(db);
+            return 0;
+        }
+        _tcscat(EscSFLF,_T("%"));
+        
+        SFLFUTF8 = (char *) malloc(sizeof(char)*(3*(1+_tcslen(EscSFLF))));
+        if (SFLFUTF8 == NULL)
+        {
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOOM);
+            free(EscSFLF);
+            sqlite3_close(db);
+            return 0;
+        }
+        if (TSTRToUTF8Str(SFLFUTF8, EscSFLF) == 0)
+        {
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOOM);
+            free(EscSFLF);
+            free(SFLFUTF8);
+            sqlite3_close(db);
+            return 0;
+        }
+        free(EscSFLF);
+        strcpy(WhereStatement,"WHERE FLIndex.FirstLine LIKE '");
+        strcat(WhereStatement,SFLFUTF8);
+        strcat(WhereStatement,"' ESCAPE '\\' ");
+        free(SFLFUTF8);
+    }
+    if (FavOnly == TRUE)
+    {
+        if (WhereStatement[0] == 0)
+        {
+            strcpy(WhereStatement, "WHERE ");
+        }
+        else
+        {
+            strcat(WhereStatement, "AND ");
+        }
+        sprintf(FlagStatement, "(Song.Flags & %d) > 0 ", DBFLAG_FAV);
+        strcat(WhereStatement, FlagStatement);
+    }
+    if (IncSong == FALSE)
+    {
+        if (WhereStatement[0] == 0)
+        {
+            strcpy(WhereStatement, "WHERE ");
+        }
+        else
+        {
+            strcat(WhereStatement, "AND ");
+        }
+        sprintf(FlagStatement, "(Song.Flags & %d) != %d ", DBFLAG_TYPE, DBFLAG_TYPE_SONG);
+        strcat(WhereStatement, FlagStatement);
+    }
+    if (IncHymn == FALSE)
+    {
+        if (WhereStatement[0] == 0)
+        {
+            strcpy(WhereStatement, "WHERE ");
+        }
+        else
+        {
+            strcat(WhereStatement, "AND ");
+        }
+        sprintf(FlagStatement, "(Song.Flags & %d) != %d ", DBFLAG_TYPE, DBFLAG_TYPE_HYMN);
+        strcat(WhereStatement, FlagStatement);
+    }
+    if (IncLit == FALSE)
+    {
+        if (WhereStatement[0] == 0)
+        {
+            strcpy(WhereStatement, "WHERE ");
+        }
+        else
+        {
+            strcat(WhereStatement, "AND ");
+        }
+        sprintf(FlagStatement, "(Song.Flags & %d) != %d ", DBFLAG_TYPE, DBFLAG_TYPE_LITURGY);
+        strcat(WhereStatement, FlagStatement);
+    }
+    if (IncMeta == FALSE)
+    {
+        if (WhereStatement[0] == 0)
+        {
+            strcpy(WhereStatement, "WHERE ");
+        }
+        else
+        {
+            strcat(WhereStatement, "AND ");
+        }
+        sprintf(FlagStatement, "(Song.Flags & %d) != %d ", DBFLAG_TYPE, DBFLAG_TYPE_META);
+        strcat(WhereStatement, FlagStatement);
+    }
+    sprintf(SQLStatement,"SELECT FLIndex.FirstLine AS FLine FROM Song INNER JOIN FLIndex ON Song.SongTitle = FLIndex.SongTitle %s LIMIT 32000;",WhereStatement);
+    
+    rc = sqlite3_exec(db, SQLStatement, songflcallback, 0, &zErrMsg);
+
+    if( rc!=SQLITE_OK )
+    {
+        if (zErrMsg != NULL) AnErrMsg = (char *) malloc((256+strlen(zErrMsg))*sizeof(char));
+        else AnErrMsg = (char *) malloc(256*sizeof(char));
+        if (AnErrMsg != NULL)
+        {
+            if (zErrMsg != NULL) sprintf(AnErrMsg, "SQL error: %s.", zErrMsg);
+            else strcpy(AnErrMsg, "Unknown Database Error!");
+            exterrmsgA(NULL, ERR_CAT_DB, AnErrMsg);
+            free(AnErrMsg);
+        }
+        else
+        {
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBSQL);
+        }
+        sqlite3_free(zErrMsg);
+        sqlite3_close(db);
+        return 0;
+    }
+    sqlite3_close(db);
+    return 1;
+}
+
+int CleanUpDB()
+{
+    sqlite3 *db;
+    char *AnErrMsg = NULL;
+    char *zErrMsg = NULL;
+    int rc;
+    
+    rc = sqlite3_open(DB_FILENAME, &db); //Do something about this, it should not be hardcoded like this!
+    if( rc )
+    {
+        AnErrMsg = (char *) malloc(2048*sizeof(char));
+        if (AnErrMsg != NULL)
+        {
+            sprintf(AnErrMsg, "Cannot open database: %s.", sqlite3_errmsg(db));
+            exterrmsgA(NULL, ERR_CAT_DB, AnErrMsg);
+            free(AnErrMsg);
+        } else doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBOPEN);
+        sqlite3_close(db);
+        return 0;
+    }
+    
+    rc = sqlite3_exec(db, "VACUUM;", NULL, 0, &zErrMsg);
+
+    if( rc!=SQLITE_OK )
+    {
+        if (zErrMsg != NULL) AnErrMsg = (char *) malloc((256+strlen(zErrMsg))*sizeof(char));
+        else AnErrMsg = (char *) malloc(256*sizeof(char));
+        if (AnErrMsg != NULL)
+        {
+            if (zErrMsg != NULL) sprintf(AnErrMsg, "SQL error: %s.", zErrMsg);
+            else strcpy(AnErrMsg, "Unknown Database Error!");
+            exterrmsgA(NULL, ERR_CAT_DB, AnErrMsg);
+            free(AnErrMsg);
+        }
+        else
+        {
+            doerrmsg(NULL, ERR_CAT_DB, ERR_SUB_DBSQL);
         }
         sqlite3_free(zErrMsg);
         sqlite3_close(db);
