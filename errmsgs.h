@@ -17,6 +17,14 @@
 #define   ERR_SUB_CREATEIMAGESBTN 6
 #define   ERR_SUB_CREATESONGSBYTITLEBTN 7
 #define   ERR_SUB_CREATESONGSBYFLBTN 8
+#define   ERR_SUB_CREATESONGFGRP 9
+#define   ERR_SUB_CREATESONGFTXT 10
+#define   ERR_SUB_CREATESONGFBTN 11
+#define   ERR_SUB_CREATESONGFAVFCHK 12
+#define   ERR_SUB_CREATESONGSOFCHK 13
+#define   ERR_SUB_CREATESONGHYFCHK 14
+#define   ERR_SUB_CREATESONGLITFCHK 15
+#define   ERR_SUB_CREATESONGMETAFCHK 16
 #define ERR_CAT_SHOWHIDESCREEN 3
 #define   ERR_SUB_SHOWHIDENOMENUITEMSTATE 1
 #define   ERR_SUB_SHOWHIDECHANGESCRNSHOWSTATE 2
@@ -36,6 +44,13 @@
 #define   ERR_SUB_DBOOM 2
 #define   ERR_SUB_DBCONVFILTER 3
 #define   ERR_SUB_DBSQL 4
+#define ERR_CAT_SOFILTER 7
+#define   ERR_SUB_SOFOOM 1
+#define   ERR_SUB_SOFNOCHECKBTNSTATE 2
+#define   ERR_SUB_SOFSETMENUITEMSTATE 3
+#define   ERR_SUB_SOFEXEC 4
+#define   ERR_SUB_SOFSETFILTERTEXT 5
+#define   ERR_SUB_SOFSETCHECKBTNSTATE 6
 
 
 #ifndef ERRORLANG
@@ -48,18 +63,21 @@
 #define ERR_CATTXT_CHGCONTROLVIEW _T("Error Changing View!")
 #define ERR_CATTXT_STARTPROG _T("Error Starting Open Trebuchet!")
 #define ERR_CATTXT_DB _T("Database Error!")
+#define ERR_CATTXT_SOFILTER _T("Error Applying Filter!")
 #elif ERRORLANG == _LANG_FRANCAIS
 #define ERR_CATTXT_CREATECONTROL _T("Erreur Création de Contrôles!")
 #define ERR_CATTXT_SHOWHIDESCREEN _T("Erreur Affichage/Masquage de l'Écran!")
 #define ERR_CATTXT_CHGCONTROLVIEW _T("Erreur lors du Changement View!")
 #define ERR_CATTXT_STARTPROG _T("Erreur lors du Démarrage Open Trebuchet!")
 #define ERR_CATTXT_DB _T("Erreur de la Base de Données!")
+#define ERR_CATTXT_SOFILTER _T("Erreur Application du Filtre!")
 #elif ERRORLANG == _LANG_CYMRAIG
 #define ERR_CATTXT_CREATECONTROL _T("Gwall Creu Rheolaethau!")
 #define ERR_CATTXT_SHOWHIDESCREEN _T("Gwall Dangos/Cuddio Sgrin!")
 #define ERR_CATTXT_CHGCONTROLVIEW _T("Gwall Newid Ymddangosiad!")
 #define ERR_CATTXT_STARTPROG _T("Gwall Dechrau Open Trebuchet!")
 #define ERR_CATTXT_DB _T("Gwall Cronfa Ddata!")
+#define ERR_CATTXT_SOFILTER _T("Gwall Cymhwyso'r Hidlen!")
 #endif
 
 

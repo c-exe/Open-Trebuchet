@@ -66,6 +66,54 @@ int doerrmsg(HWND hwnd, unsigned long errorcategory, unsigned long suberror)
 #endif
               break;
 
+              case ERR_SUB_CREATESONGFGRP:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Song Filter Groupbox!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_CREATESONGFTXT:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Song Filter Textbox!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_CREATESONGFBTN:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Song Filter Button!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_CREATESONGFAVFCHK:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Song Favourites Filter Checkbox!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_CREATESONGSOFCHK:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Song Filter Checkbox!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_CREATESONGHYFCHK:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Hymn Filter Checkbox!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_CREATESONGLITFCHK:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Liturgy Filter Checkbox!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_CREATESONGMETAFCHK:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Meta Filter Checkbox!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
               default:
 #if ERRORLANG == _LANG_ENGLISH
                 MessageBox(hwnd, _T("Could not create Unknown Control!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
@@ -207,6 +255,53 @@ int doerrmsg(HWND hwnd, unsigned long errorcategory, unsigned long suberror)
               break;
           }
         break;
+
+        case ERR_CAT_SOFILTER:
+          switch (suberror)
+          {
+              case ERR_SUB_SOFOOM:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Out of Memory filtering song data!"), ERR_CATTXT_SOFILTER, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_SOFNOCHECKBTNSTATE:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Failed to get checkbutton state!"), ERR_CATTXT_SOFILTER, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_SOFSETMENUITEMSTATE:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Failed to set menu item state!"), ERR_CATTXT_SOFILTER, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_SOFEXEC:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Failed to execute filter!"), ERR_CATTXT_SOFILTER, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_SOFSETFILTERTEXT:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Failed to set filter text!"), ERR_CATTXT_SOFILTER, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_SOFSETCHECKBTNSTATE:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Failed to set checkbutton state!"), ERR_CATTXT_SOFILTER, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              default:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Unknown filtering error!"), ERR_CATTXT_SOFILTER, MB_OK | MB_ICONERROR);
+#endif
+              break;
+          }
+        break;
     }
 }
 
@@ -217,6 +312,10 @@ int exterrmsg(HWND hwnd, unsigned long errorcategory, LPTSTR theerrmsg)
         case ERR_CAT_LISTBOX:
 #if ERRORLANG == _LANG_ENGLISH
           MessageBox(hwnd, theerrmsg, _T("ListBox Error!"), MB_OK | MB_ICONERROR);
+#elif ERRORLANG == _LANG_FRANCAIS
+          MessageBox(hwnd, theerrmsg, _T("Erreur de la Liste-Box!"), MB_OK | MB_ICONERROR);
+#elif ERRORLANG == _LANG_CYMRAIG
+          MessageBox(hwnd, theerrmsg, _T("Gwall Rhestr-Bocs!"), MB_OK | MB_ICONERROR);
 #endif
         break;
     }
@@ -229,6 +328,10 @@ int exterrmsgA(HWND hwnd, unsigned long errorcategory, char *theerrmsg)
         case ERR_CAT_DB:
 #if ERRORLANG == _LANG_ENGLISH
           MessageBoxA(hwnd, theerrmsg, "Database Error!", MB_OK | MB_ICONERROR);
+#elif ERRORLANG == _LANG_FRANCAIS
+          MessageBoxA(hwnd, theerrmsg, "Erreur de la Base de Données!", MB_OK | MB_ICONERROR);
+#elif ERRORLANG == _LANG_CYMRAIG
+          MessageBoxA(hwnd, theerrmsg, "Gwall Cronfa Ddata!", MB_OK | MB_ICONERROR);
 #endif
         break;
     }

@@ -18,7 +18,12 @@
 HWND GetScreenHandle();
 int GetScrDetails(int ScrDetail);
 BOOL AddItemToListBox(int AListBox, LPTSTR ItemText);
+BOOL ClearListBox(int AListBox);
+BOOL SongsByTitleOrByFLine();
+BOOL ApplySongsFilter();
 UINT GetWindowShowState(HWND hwnd);
+BOOL TickMenuItem(HWND hWindow, UINT menuitem);
+BOOL UntickMenuItem(HWND hWindow, UINT menuitem);
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK ScreenWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL ShowHideWindow(HWND AWindow, BOOL ShowWindow);
