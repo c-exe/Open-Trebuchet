@@ -326,7 +326,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             hSoFGrp = CreateWindowEx(WS_EX_LEFT, "BUTTON", _T("Filter Songs"), WS_CHILD | WS_TABSTOP | WS_VISIBLE |
                                      BS_GROUPBOX | BS_TEXT | BS_LEFT | BS_TOP,
-                                     SoFGrpX, SoFGrpY, 162, 110, hwnd, (HMENU) IDC_SONGFILTER_GRP,
+                                     SoFGrpX, SoFGrpY, 162, SOFGRP_HEIGHT, hwnd, (HMENU) IDC_SONGFILTER_GRP,
                                      GetModuleHandle(NULL), NULL);
             if (hSoFGrp == NULL)
             {
@@ -441,6 +441,169 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         case WM_DESTROY:
           PostQuitMessage(0);
+        break;
+
+        case WM_SIZE:
+        {
+            RECT rcClient;
+            HWND hSchedLB, hSongLB, hSongFLLB, hSongsBtn, hBiblesBtn, hImagesBtn, hByTitleBtn, hByFLineBtn;
+            HWND hSoFGrp, hSoFTxt, hSoFBtn, hSoFFavChk, hSoFSoChk, hSoFHyChk, hSoFLitChk, hSoFMeChk;
+            
+            hSchedLB = GetDlgItem(hwnd,IDC_SCHEDULE_LISTBOX);
+            hSongLB = GetDlgItem(hwnd,IDC_SONGS_LISTBOX);
+            hSongFLLB = GetDlgItem(hwnd,IDC_SONGFIRSTLINES_LISTBOX);
+            hSongsBtn = GetDlgItem(hwnd,IDC_SONGS_BTN);
+            hBiblesBtn = GetDlgItem(hwnd,IDC_BIBLES_BTN);
+            hImagesBtn = GetDlgItem(hwnd,IDC_IMAGES_BTN);
+            hByTitleBtn = GetDlgItem(hwnd,IDC_BYTITLE_BTN);
+            hByFLineBtn = GetDlgItem(hwnd,IDC_BYFLINE_BTN);
+            hSoFGrp = GetDlgItem(hwnd,IDC_SONGFILTER_GRP);
+            hSoFTxt = GetDlgItem(hwnd,IDC_SONGFILTER_TXT);
+            hSoFBtn = GetDlgItem(hwnd,IDC_SONGFILTER_BTN);
+            hSoFFavChk = GetDlgItem(hwnd,IDC_SONGFILTERFAV_CHK);
+            hSoFSoChk = GetDlgItem(hwnd,IDC_SONGFILTERSONGS_CHK);
+            hSoFHyChk = GetDlgItem(hwnd,IDC_SONGFILTERHYMNS_CHK);
+            hSoFLitChk = GetDlgItem(hwnd,IDC_SONGFILTERLIT_CHK);
+            hSoFMeChk = GetDlgItem(hwnd,IDC_SONGFILTERMETA_CHK);
+            
+            GetClientRect(hwnd, &rcClient);
+            
+            int CalcH = (rcClient.bottom / 2) - SchedLBY - 5 - 20;
+            if (CalcH < MIN_LB_HEIGHT) CalcH = MIN_LB_HEIGHT;
+            if (hSchedLB != NULL)
+            {
+                if (SetWindowPos(hSchedLB, NULL, SchedLBX, SchedLBY, SchedLBW, CalcH, SWP_NOZORDER))
+                {
+                    SchedLBH = CalcH;
+                }
+            }
+            
+            int CalcY = CalcH + 5;
+            if (hSongsBtn != NULL)
+            {
+                if (SetWindowPos(hSongsBtn, NULL, SongsBtnX, CalcY, 0, 0, SWP_NOZORDER | SWP_NOSIZE))
+                {
+                    SongsBtnY = CalcY;
+                }
+            }
+            if (hBiblesBtn != NULL)
+            {
+                if (SetWindowPos(hBiblesBtn, NULL, BiblesBtnX, CalcY, 0, 0, SWP_NOZORDER | SWP_NOSIZE))
+                {
+                    BiblesBtnY = CalcY;
+                }
+            }
+            if (hImagesBtn != NULL)
+            {
+                if (SetWindowPos(hImagesBtn, NULL, ImagesBtnX, CalcY, 0, 0, SWP_NOZORDER | SWP_NOSIZE))
+                {
+                    ImagesBtnY = CalcY;
+                }
+            }
+            
+            CalcY += 5 + 20;
+            if (hByTitleBtn != NULL)
+            {
+                if (SetWindowPos(hByTitleBtn, NULL, ByTitleBtnX, CalcY, 0, 0, SWP_NOZORDER | SWP_NOSIZE))
+                {
+                    ByTitleBtnY = CalcY;
+                }
+            }
+            if (hByFLineBtn != NULL)
+            {
+                if (SetWindowPos(hByFLineBtn, NULL, ByFLineBtnX, CalcY, 0, 0, SWP_NOZORDER | SWP_NOSIZE))
+                {
+                    ByFLineBtnY = CalcY;
+                }
+            }
+            
+            CalcY += 30;
+            CalcH = rcClient.bottom - (CalcY + SOFGRP_HEIGHT);
+            if (CalcH < MIN_LB_HEIGHT) CalcH = MIN_LB_HEIGHT;
+            if (hSongLB != NULL)
+            {
+                if (SetWindowPos(hSongLB, NULL, SongLBX, CalcY, SongLBW, CalcH, SWP_NOZORDER))
+                {
+                    SongLBY = CalcY;
+                    SongLBH = CalcH;
+                }
+            }
+            if (hSongFLLB != NULL)
+            {
+                if (SetWindowPos(hSongFLLB, NULL, SongFLLBX, CalcY, SongFLLBW, CalcH, SWP_NOZORDER))
+                {
+                    SongFLLBY = CalcY;
+                    SongFLLBH = CalcH;
+                }
+            }
+            
+            CalcY += CalcH;
+            if (hSoFGrp != NULL)
+            {
+                if (SetWindowPos(hSoFGrp, NULL, SoFGrpX, CalcY, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_DEFERERASE))
+                {
+                    SoFGrpY = CalcY;
+                }
+            }
+            if (hSoFTxt != NULL)
+            {
+                if (SetWindowPos(hSoFTxt, NULL, SoFGrpX+0, CalcY+15, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_DEFERERASE))
+                {
+                    //SoFGrpY = CalcY+15;
+                }
+            }
+            if (hSoFBtn != NULL)
+            {
+                if (SetWindowPos(hSoFBtn, NULL, SoFGrpX+112, CalcY+15, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_DEFERERASE))
+                {
+                    //SoFGrpY = CalcY+15;
+                }
+            }
+            if (hSoFFavChk != NULL)
+            {
+                if (SetWindowPos(hSoFFavChk, NULL, SoFGrpX+0, CalcY+45, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_DEFERERASE))
+                {
+                    //SoFGrpY = CalcY+45;
+                }
+            }
+            if (hSoFHyChk != NULL)
+            {
+                if (SetWindowPos(hSoFHyChk, NULL, SoFGrpX+115, CalcY+45, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_DEFERERASE))
+                {
+                    //SoFGrpY = CalcY+45;
+                }
+            }
+            if (hSoFSoChk != NULL)
+            {
+                if (SetWindowPos(hSoFSoChk, NULL, SoFGrpX+70, CalcY+45, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_DEFERERASE))
+                {
+                    //SoFGrpY = CalcY+45;
+                }
+            }
+            if (hSoFLitChk != NULL)
+            {
+                if (SetWindowPos(hSoFLitChk, NULL, SoFGrpX+70, CalcY+75, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_DEFERERASE))
+                {
+                    //SoFGrpY = CalcY+75;
+                }
+            }
+            if (hSoFMeChk != NULL)
+            {
+                if (SetWindowPos(hSoFMeChk, NULL, SoFGrpX+115, CalcY+75, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_DEFERERASE))
+                {
+                    //SoFGrpY = CalcY+75;
+                }
+            }
+            RECT RepaintR;
+            RepaintR.left = SoFGrpX;
+            RepaintR.top = SoFGrpY;
+            RepaintR.right = SoFGrpX + 162;
+            RepaintR.bottom = SoFGrpY+SOFGRP_HEIGHT;
+            if (InvalidateRect(hwnd,&RepaintR,FALSE))
+            UpdateWindow(hwnd);
+            
+            return 0;//DefWindowProc(hwnd, msg, wParam, lParam);
+        }
         break;
 
         case WM_COMMAND:

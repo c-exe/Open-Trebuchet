@@ -13,6 +13,9 @@
 
 #define BAD_SHOW_STATE 1000
 
+#define MIN_LB_HEIGHT 15
+#define SOFGRP_HEIGHT 110
+
 #include <windows.h>
 
 HWND GetScreenHandle();
