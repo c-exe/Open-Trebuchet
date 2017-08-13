@@ -31,6 +31,8 @@ long SongsBtnX = 0, SongsBtnY = 100;
 long SongFLLBX = 0, SongFLLBY = 155, SongFLLBW = 162, SongFLLBH = 100;
 long SongLBX = 0, SongLBY = 155, SongLBW = 162, SongLBH = 100;
 long SchedLBX = 0, SchedLBY = 0, SchedLBW = 162, SchedLBH = 100;
+long UToPanX = 162, UToPanY = 0, UToPanW = 30, UToPanH = 155;
+long LToPanX = 162, LToPanY = 155, LToPanW = 30, LToPanH = 150;
 
 
 HWND GetScreenHandle()
@@ -208,6 +210,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             HFONT hfDefault;
             HWND hSchedLB, hSongLB, hSongFLLB, hSongsBtn, hBiblesBtn, hImagesBtn, hByTitleBtn, hByFLineBtn;
             HWND hSoFGrp, hSoFTxt, hSoFBtn, hSoFFavChk, hSoFSoChk, hSoFHyChk, hSoFLitChk, hSoFMeChk;
+            HWND hUToPan, hLToPan;
 
             MainWindow = hwnd;
 
@@ -430,6 +433,32 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             SendMessage(hSoFMeChk, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
             SendMessage(hSoFMeChk, BM_SETCHECK, (WPARAM)BST_CHECKED, MAKELPARAM(0, 0));
 
+            //Upper Tools Panel
+
+            hUToPan = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", _T("Upper"), WS_CHILD | WS_TABSTOP | WS_VISIBLE |
+                                     SS_CENTER | SS_ETCHEDFRAME ,
+                                     UToPanX, UToPanY, UToPanW, UToPanH, hwnd, (HMENU) IDC_UPPERTOOLS_PANEL,
+                                     GetModuleHandle(NULL), NULL);
+            if (hUToPan == NULL)
+            {
+                doerrmsg(hwnd, ERR_CAT_CREATECONTROL, ERR_SUB_CREATEUPPERTOOLSPANEL);
+                break;
+            }
+            SendMessage(hUToPan, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
+            
+            //Lower Tools Panel
+
+            hLToPan = CreateWindowEx(WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE, "STATIC", _T("Lower"), WS_CHILD |
+                                     WS_TABSTOP | WS_VISIBLE | SS_CENTER ,
+                                     LToPanX, LToPanY, LToPanW, LToPanH, hwnd, (HMENU) IDC_LOWERTOOLS_PANEL,
+                                     GetModuleHandle(NULL), NULL);
+            if (hLToPan == NULL)
+            {
+                doerrmsg(hwnd, ERR_CAT_CREATECONTROL, ERR_SUB_CREATELOWERTOOLSPANEL);
+                break;
+            }
+            SendMessage(hLToPan, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
+            
             //
         }
         break;
@@ -599,7 +628,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             RepaintR.top = SoFGrpY;
             RepaintR.right = SoFGrpX + 162;
             RepaintR.bottom = SoFGrpY+SOFGRP_HEIGHT;
-            if (InvalidateRect(hwnd,&RepaintR,FALSE))
+            InvalidateRect(hwnd,&RepaintR,FALSE);
             UpdateWindow(hwnd);
             
             return 0;//DefWindowProc(hwnd, msg, wParam, lParam);

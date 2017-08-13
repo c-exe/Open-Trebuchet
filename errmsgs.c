@@ -114,6 +114,18 @@ int doerrmsg(HWND hwnd, unsigned long errorcategory, unsigned long suberror)
 #endif
               break;
 
+              case ERR_SUB_CREATEUPPERTOOLSPANEL:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Upper Tools Panel!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
+              case ERR_SUB_CREATELOWERTOOLSPANEL:
+#if ERRORLANG == _LANG_ENGLISH
+                MessageBox(hwnd, _T("Could not create Lower Tools Panel!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
+#endif
+              break;
+
               default:
 #if ERRORLANG == _LANG_ENGLISH
                 MessageBox(hwnd, _T("Could not create Unknown Control!"), ERR_CATTXT_CREATECONTROL, MB_OK | MB_ICONERROR);
